@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+- Added an independent current-target nameplate highlight for enemy and friendly nameplates.
+- Matched the existing Party Target Highlight strong-border and outer-glow style.
+- Added a Settings UI toggle for the nameplate highlight.
+- Added a high-level overlay designed to stay prominent with nameplate skinning addons such as BetterBlizzPlates.
+- Kept updates event-driven with a single active-nameplate reference and no per-frame nameplate scan.
+
 ## 0.2.1
 
 - Fixed a WoW 12.1 Settings tooltip error caused by the legacy multi-argument `GameTooltip:SetText(text, r, g, b, wrap)` call.

@@ -1,8 +1,8 @@
 ## Interface: 120100
 ## Title: Pandahorn PVP Helper
-## Notes: Modular PvP helper for arena-friendly identity masking and party target highlighting.
+## Notes: Modular PvP helper for identity masking and current-target highlighting.
 ## Author: Pandahorn
-## Version: 0.2.1
+## Version: 0.3.0
 ## SavedVariables: PandahornPVPHelperDB
 ## X-Category: PvP
 ## X-License: MIT
@@ -12,5 +12,6 @@ Data/Specs.lua
 Services/Inspect.lua
 Modules/FriendlyIdentity.lua
 Modules/PartyTargetHighlight.lua
+Modules/NameplateTargetHighlight.lua
 UI/Settings.lua
 Commands.lua

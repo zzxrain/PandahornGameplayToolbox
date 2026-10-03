@@ -3,7 +3,7 @@ local ADDON_NAME, PPH = ...
 _G.PandahornPVPHelper = PPH
 
 PPH.name = "Pandahorn PVP Helper"
-PPH.version = "0.2.1"
+PPH.version = "0.3.0"
 PPH.modules = PPH.modules or {}
 PPH.moduleOrder = PPH.moduleOrder or {}
 PPH.callbacks = PPH.callbacks or {}
@@ -11,7 +11,7 @@ PPH.initialized = false
 PPH.inArena = false
 
 local DEFAULTS = {
-    dbVersion = 2,
+    dbVersion = 3,
     enabled = true,
     debug = false,
 
@@ -38,6 +38,10 @@ local DEFAULTS = {
         glowOutset = 4,
         frameLevelOffset = 30,
         initialResyncDelay = 0.25,
+    },
+
+    nameplateTargetHighlight = {
+        enabled = true,
     },
 }
 

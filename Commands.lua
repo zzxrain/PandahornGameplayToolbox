@@ -7,6 +7,7 @@ end
 function PPH:PrintStatus()
     local fi = self.db.friendlyIdentity
     local hi = self.db.partyTargetHighlight
+    local ni = self.db.nameplateTargetHighlight
 
     self:Print("v" .. self.version
         .. " | addon=" .. OnOff(self.db.enabled)
@@ -19,6 +20,8 @@ function PPH:PrintStatus()
         .. " | arenaOnly=" .. OnOff(hi.arenaOnly)
         .. " | border=" .. OnOff(hi.showBorder)
         .. " | glow=" .. OnOff(hi.showGlow))
+    self:Print("Nameplate Target Highlight: " .. OnOff(ni.enabled)
+        .. " | style=Party Target Highlight")
 end
 
 local function PrintHelp()

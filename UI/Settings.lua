@@ -174,6 +174,7 @@ function SettingsUI:RefreshControls()
     local globalEnabled = PPH.db.enabled
     local fi = PPH.db.friendlyIdentity
     local hi = PPH.db.partyTargetHighlight
+    local ni = PPH.db.nameplateTargetHighlight
 
     if self.fiEnabled then
         self.fiEnabled:SetControlEnabled(globalEnabled)
@@ -189,6 +190,10 @@ function SettingsUI:RefreshControls()
     local highlightChildrenEnabled = globalEnabled and hi.enabled
     for _, control in ipairs(self.highlightChildren or {}) do
         control:SetControlEnabled(highlightChildrenEnabled)
+    end
+
+    if self.nameplateHighlightEnabled then
+        self.nameplateHighlightEnabled:SetControlEnabled(globalEnabled and ni ~= nil)
     end
 
     if self.previewText then
@@ -212,7 +217,7 @@ function SettingsUI:BuildPanel()
     scroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -30, 4)
 
     local content = CreateFrame("Frame", nil, scroll)
-    content:SetSize(720, 880)
+    content:SetSize(720, 980)
     scroll:SetScrollChild(content)
     self.content = content
 
@@ -412,27 +417,42 @@ function SettingsUI:BuildPanel()
     ))
     table.insert(self.highlightChildren, showGlow)
 
-    CreateSection(content, "Diagnostics", 18, -748)
+    CreateSection(content, "Nameplate Target Highlight", 18, -748)
+
+    self.nameplateHighlightEnabled = self:RegisterControl(CreateCheckbox(
+        content,
+        "Enable current-target highlight on nameplates",
+        "Highlights the current enemy or friendly target's nameplate. Uses the same strong border and outer glow style as Party Target Highlight and is layered above nameplate skins such as BetterBlizzPlates.",
+        22, -782,
+        function() return PPH.db.nameplateTargetHighlight.enabled end,
+        function(value) PPH.db.nameplateTargetHighlight.enabled = value end
+    ))
+
+    local nameplateStyleNote = content:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+    nameplateStyleNote:SetPoint("TOPLEFT", content, "TOPLEFT", 50, -814)
+    nameplateStyleNote:SetText("Style follows the Party Target Highlight border and glow settings.")
+
+    CreateSection(content, "Diagnostics", 18, -854)
 
     self.debugControl = self:RegisterControl(CreateCheckbox(
         content,
         "Debug messages",
         "Print additional PPH state information to chat for troubleshooting.",
-        22, -782,
+        22, -888,
         function() return PPH.db.debug end,
         function(value) PPH.db.debug = value end
     ))
 
     self.statusText = content:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    self.statusText:SetPoint("TOPLEFT", content, "TOPLEFT", 270, -788)
+    self.statusText:SetPoint("TOPLEFT", content, "TOPLEFT", 270, -894)
 
-    CreateButton(content, "Reset defaults", 22, -824, 120, function()
+    CreateButton(content, "Reset defaults", 22, -930, 120, function()
         PPH:ResetToDefaults()
         SettingsUI:RefreshControls()
         PPH:Print("Settings reset to defaults.")
     end)
 
-    CreateButton(content, "Print status", 150, -824, 110, function()
+    CreateButton(content, "Print status", 150, -930, 110, function()
         if PPH.PrintStatus then
             PPH:PrintStatus()
         else

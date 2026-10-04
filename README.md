@@ -2,7 +2,7 @@
 
 A lightweight, modular World of Warcraft Retail PvP helper designed for Midnight / Patch 12.1.
 
-## Version 0.3.0
+## Version 0.4.0
 
 ### 1. Friendly Identity
 
@@ -21,14 +21,14 @@ Integrated from the standalone `SimplePartyHighlight` prototype as a separate PP
 
 - Highlights the Blizzard compact party/raid frame that represents your current target.
 - Uses Blizzard's existing `frame.selectionHighlight:IsShown()` state rather than directly re-evaluating target identity with `UnitIsUnit()`.
-- Strong border + outer glow visual style.
+- Strong border + outer glow visual style with configurable color, thickness, and contrast.
 - Default: enabled and **arena-only**.
 - Settings allow border/glow to be enabled independently.
 
 ### 3. Nameplate Target Highlight
 
 - Highlights the nameplate belonging to the current target, for both enemies and friendlies.
-- Uses the same strong border and outer glow style settings as Party Target Highlight.
+- Has its own independently configurable border/glow, color, thickness, and contrast settings.
 - Runs independently from Party Target Highlight and has its own Settings UI toggle.
 - Uses event-driven target/nameplate updates instead of an `OnUpdate` scan.
 - The independent high-level overlay is designed to remain prominent with nameplate skins such as BetterBlizzPlates.
@@ -60,7 +60,7 @@ Copy the `PandahornPVPHelper` folder to:
 
 `World of Warcraft/_retail_/Interface/AddOns/`
 
-If you previously installed the standalone `SimplePartyHighlight`, disable or remove it after installing PPH 0.3.0 to avoid duplicate target highlight visuals.
+If you previously installed the standalone `SimplePartyHighlight`, disable or remove it after installing PPH 0.4.0 to avoid duplicate target highlight visuals.
 
 ## Name format examples
 

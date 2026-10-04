@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0
+
+- Added Settings UI controls for Party / Raid Frame highlight color, thickness, and contrast.
+- Added separate Settings UI controls for nameplate highlight color, thickness, and contrast.
+- Made nameplate border/glow visibility and visual styling independent from Party / Raid Frame highlighting.
+- Preserved existing core identity masking and event-driven target detection behavior.
+
 ## 0.3.0
 
 - Added an independent current-target nameplate highlight for enemy and friendly nameplates.

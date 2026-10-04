@@ -105,6 +105,33 @@ function PartyTargetHighlight:ShowHighlight(frame)
     end
 end
 
+function PartyTargetHighlight:ApplyStyle(frame)
+    local db = self:GetSettings()
+    local border = frame and frame.PPH_TargetHighlightBorder
+    local glow = frame and frame.PPH_TargetHighlightGlow
+    if not db or not border or not glow then
+        return
+    end
+
+    local color = db.color or { 0.35, 1.00, 0.18 }
+    local thickness = math.max(1, math.min(12, tonumber(db.thickness) or 5))
+    local contrast = math.max(0, math.min(100, tonumber(db.contrast) or 85)) / 100
+    local borderOutset = db.borderOutset or 2
+    local glowOutset = db.glowOutset or 4
+
+    glow:ClearAllPoints()
+    glow:SetPoint("TOPLEFT", frame, "TOPLEFT", -glowOutset, glowOutset)
+    glow:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", glowOutset, -glowOutset)
+    glow:SetBackdrop({ edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = thickness + 2 })
+    glow:SetBackdropBorderColor(color[1], color[2], color[3], 0.10 + (contrast * 0.70))
+
+    border:ClearAllPoints()
+    border:SetPoint("TOPLEFT", frame, "TOPLEFT", -borderOutset, borderOutset)
+    border:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", borderOutset, -borderOutset)
+    border:SetBackdrop({ edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = thickness })
+    border:SetBackdropBorderColor(color[1], color[2], color[3], 0.35 + (contrast * 0.65))
+end
+
 function PartyTargetHighlight:CreateHighlight(frame)
     local db = self:GetSettings()
     local borderOutset = db.borderOutset or 2
@@ -139,6 +166,7 @@ function PartyTargetHighlight:CreateHighlight(frame)
 
     frame.PPH_TargetHighlightGlow = glow
     frame.PPH_TargetHighlightBorder = border
+    self:ApplyStyle(frame)
     return border
 end
 
@@ -184,6 +212,8 @@ function PartyTargetHighlight:SyncHighlight(frame)
     if not highlight then
         return
     end
+
+    self:ApplyStyle(frame)
 
     if self:IsFrameSelected(frame) then
         self:ShowHighlight(frame)

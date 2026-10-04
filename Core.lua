@@ -3,7 +3,7 @@ local ADDON_NAME, PPH = ...
 _G.PandahornPVPHelper = PPH
 
 PPH.name = "Pandahorn PVP Helper"
-PPH.version = "0.3.0"
+PPH.version = "0.4.0"
 PPH.modules = PPH.modules or {}
 PPH.moduleOrder = PPH.moduleOrder or {}
 PPH.callbacks = PPH.callbacks or {}
@@ -11,7 +11,7 @@ PPH.initialized = false
 PPH.inArena = false
 
 local DEFAULTS = {
-    dbVersion = 3,
+    dbVersion = 4,
     enabled = true,
     debug = false,
 
@@ -30,6 +30,9 @@ local DEFAULTS = {
         arenaOnly = true,
         showBorder = true,
         showGlow = true,
+        color = { 0.35, 1.00, 0.18 },
+        thickness = 5,
+        contrast = 85,
         borderColor = { 0.35, 1.00, 0.18, 1.00 },
         glowColor = { 0.20, 1.00, 0.12, 0.88 },
         borderSize = 5,
@@ -42,6 +45,14 @@ local DEFAULTS = {
 
     nameplateTargetHighlight = {
         enabled = true,
+        showBorder = true,
+        showGlow = true,
+        color = { 1.00, 0.72, 0.12 },
+        thickness = 4,
+        contrast = 90,
+        borderOutset = 2,
+        glowOutset = 4,
+        frameLevelOffset = 100,
     },
 }
 

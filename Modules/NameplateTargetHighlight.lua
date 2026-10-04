@@ -8,10 +8,6 @@ local NameplateTargetHighlight = {
     deferredSyncPending = false,
 }
 
-local function GetStyleSettings()
-    return PPH.db and PPH.db.partyTargetHighlight
-end
-
 function NameplateTargetHighlight:GetSettings()
     return PPH.db and PPH.db.nameplateTargetHighlight
 end
@@ -55,7 +51,7 @@ function NameplateTargetHighlight:Hide(plate)
 end
 
 function NameplateTargetHighlight:Create(plate, anchor)
-    local style = GetStyleSettings()
+    local style = self:GetSettings()
     if not style then
         return nil
     end
@@ -88,7 +84,7 @@ function NameplateTargetHighlight:Create(plate, anchor)
 end
 
 function NameplateTargetHighlight:ApplyLayout(plate, visual, anchor)
-    local style = GetStyleSettings()
+    local style = self:GetSettings()
     if not style then
         return
     end
@@ -97,6 +93,9 @@ function NameplateTargetHighlight:ApplyLayout(plate, visual, anchor)
         visual.anchor = anchor
     end
 
+    local color = style.color or { 1.00, 0.72, 0.12 }
+    local thickness = math.max(1, math.min(12, tonumber(style.thickness) or 4))
+    local contrast = math.max(0, math.min(100, tonumber(style.contrast) or 90)) / 100
     local borderOutset = style.borderOutset or 2
     local glowOutset = style.glowOutset or 4
     local baseLevel = math.max(plate:GetFrameLevel(), anchor:GetFrameLevel())
@@ -107,19 +106,21 @@ function NameplateTargetHighlight:ApplyLayout(plate, visual, anchor)
     visual.glow:SetPoint("BOTTOMRIGHT", anchor, "BOTTOMRIGHT", glowOutset, -glowOutset)
     visual.glow:SetFrameStrata("HIGH")
     visual.glow:SetFrameLevel(baseLevel + levelOffset - 1)
-    visual.glow:SetBackdropBorderColor(unpack(style.glowColor or { 0.20, 1.00, 0.12, 0.88 }))
+    visual.glow:SetBackdrop({ edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = thickness + 2 })
+    visual.glow:SetBackdropBorderColor(color[1], color[2], color[3], 0.10 + (contrast * 0.70))
 
     visual.border:ClearAllPoints()
     visual.border:SetPoint("TOPLEFT", anchor, "TOPLEFT", -borderOutset, borderOutset)
     visual.border:SetPoint("BOTTOMRIGHT", anchor, "BOTTOMRIGHT", borderOutset, -borderOutset)
     visual.border:SetFrameStrata("HIGH")
     visual.border:SetFrameLevel(baseLevel + levelOffset)
-    visual.border:SetBackdropBorderColor(unpack(style.borderColor or { 0.35, 1.00, 0.18, 1.00 }))
+    visual.border:SetBackdrop({ edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = thickness })
+    visual.border:SetBackdropBorderColor(color[1], color[2], color[3], 0.35 + (contrast * 0.65))
 end
 
 function NameplateTargetHighlight:Show(plate)
     local anchor = self:GetAnchor(plate)
-    local style = GetStyleSettings()
+    local style = self:GetSettings()
     if not anchor or not style then
         return
     end

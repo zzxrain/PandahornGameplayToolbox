@@ -2,7 +2,7 @@
 ## Title: Pandahorn PVP Helper
 ## Notes: Modular PvP helper for identity masking and current-target highlighting.
 ## Author: Pandahorn
-## Version: 0.3.0
+## Version: 0.4.0
 ## SavedVariables: PandahornPVPHelperDB
 ## X-Category: PvP
 ## X-License: MIT

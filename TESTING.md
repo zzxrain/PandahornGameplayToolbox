@@ -1,4 +1,4 @@
-# Pandahorn PVP Helper 0.3.0 - In-game Test Checklist
+# Pandahorn PVP Helper 0.4.0 - In-game Test Checklist
 
 Because the addon cannot be executed against a real WoW client in this build environment, use this checklist for the first arena session.
 
@@ -42,6 +42,7 @@ Because the addon cannot be executed against a real WoW client in this build env
 5. Toggle `Show strong border` and `Show outer glow` independently.
 6. Leave arena with `Arena only` enabled and confirm custom highlight disappears.
 7. Disable `Arena only`, target a teammate outside arena, and confirm the highlight can work outside arena.
+8. Change Party / Raid Frame highlight color, thickness, and contrast; confirm each change applies immediately.
 
 ## F. Nameplate Target Highlight
 
@@ -52,7 +53,8 @@ Because the addon cannot be executed against a real WoW client in this build env
 5. Clear the target and confirm the highlight disappears.
 6. Disable the nameplate feature and confirm it disappears without disabling Party Target Highlight.
 7. Disable Party Target Highlight while leaving the nameplate feature enabled and confirm the nameplate feature still works.
-8. Toggle the Party Target Highlight border/glow style controls and confirm the nameplate visual follows those style settings.
+8. Change the nameplate color, thickness, and contrast and confirm these settings apply immediately.
+9. Give Party / Raid Frames and nameplates visibly different styles, then confirm each retains its independent configuration.
 
 ## G. Compatibility / diagnostics
 

@@ -22,11 +22,6 @@ while IFS= read -r line || [[ -n "$line" ]]; do
             [[ "$entry" == "$prefix"* ]] || fail "IconTexture must be inside the addon directory"
             entry=${entry#"$prefix"}
             ;;
-        '# Package:'*)
-            entry=${entry#'# Package:'}
-            entry=$(printf '%s' "$entry" | sed 's/^[[:space:]]*//')
-            [[ -n "$entry" ]] || fail "Empty Package resource path"
-            ;;
     esac
     case "$entry" in
         ''|\#*) continue ;;

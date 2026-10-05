@@ -1,110 +1,31 @@
 # Pandahorn Gameplay Toolbox
 
-A lightweight, modular World of Warcraft Retail gameplay toolbox designed for Midnight / Patch 12.1.
+轻量的魔兽世界正式服 PvP 插件：看清队友职业专精，快速找到当前选中的目标。
 
-## Version 0.4.0
+## 竞技场队友重命名
 
-### 1. Friendly Identity
+进入竞技场后，将队友框架和友方目标框架中的姓名替换为职业专精，例如 `Holy Pal`。默认保留自己的名字，离开竞技场后恢复原名。
 
-Arena-only identity masking for friendly players.
+![竞技场队友框架重命名](assets/previews/Arena_Party_Frame_Rename.png)
 
-- Party / raid-style party frames: replace teammate names while keeping your own name by default.
-- Friendly Target Frame: replace the friendly player's real name with the same identity format.
-- Default format: `{spec} {class}` -> `Holy Pal`.
-- Configurable tokens: `{spec}`, `{class}`, `{party}`.
-- Specialization lookup is cached by GUID and populated through the inspect API.
-- If specialization data is not ready, the addon falls back to class / party number / `Ally`; it does not intentionally reveal the teammate's real name while masking is active.
+## 队友框架目标高亮
 
-### 2. Party Target Highlight
+选中队友时，高亮对应的暴雪小队／团队式小队框架，便于确认当前目标。默认仅在竞技场启用，也可在设置中开启其他场景。
 
-Integrated from the standalone `SimplePartyHighlight` prototype as a separate PGT module.
+![队友框架选中目标高亮](assets/previews/Party_Raid_Frame_Highlight.png)
 
-- Highlights the Blizzard compact party/raid frame that represents your current target.
-- Uses Blizzard's existing `frame.selectionHighlight:IsShown()` state rather than directly re-evaluating target identity with `UnitIsUnit()`.
-- Strong border + outer glow visual style with configurable color, thickness, and contrast.
-- Default: enabled and **arena-only**.
-- Settings allow border/glow to be enabled independently.
+## 姓名板目标高亮
 
-### 3. Nameplate Target Highlight
+为当前目标的姓名板添加醒目的边框和外发光，适用于敌方和友方目标。可与队友框架高亮独立开关、调整颜色和粗细。
 
-- Highlights the nameplate belonging to the current target, for both enemies and friendlies.
-- Has its own independently configurable border/glow, color, thickness, and contrast settings.
-- Runs independently from Party Target Highlight and has its own Settings UI toggle.
-- Uses event-driven target/nameplate updates instead of an `OnUpdate` scan.
-- The independent high-level overlay is designed to remain prominent with nameplate skins such as BetterBlizzPlates.
+![姓名板目标高亮示例一](assets/previews/Target_HighLight_1.png)
 
-### 4. Settings UI
+![姓名板目标高亮示例二](assets/previews/Target_HighLight_2.png)
 
-Open:
+## 安装与设置
 
-`Esc -> Options -> AddOns -> Pandahorn Gameplay Toolbox`
+将安装包解压到 `World of Warcraft/_retail_/Interface/AddOns/`，确认其中有 `PandahornGameplayToolbox` 文件夹。
 
-Settings are applied immediately.
+游戏内打开 **Esc → Options → AddOns → Pandahorn Gameplay Toolbox**。设置即时生效，可调整开关、姓名格式和高亮样式。
 
-Use the **Preview** buttons beside Friendly Identity, Party Target Highlight,
-and Nameplate Target Highlight to view example screenshots. The nameplate preview
-shows both supplied examples. These are static examples, not live previews of your settings.
-
-Available sections:
-
-- General
-- Friendly Identity
-- Name Format
-- Party Target Highlight
-- Nameplate Target Highlight
-- Diagnostics
-
-## Installation
-
-Copy the `PandahornGameplayToolbox` folder to:
-
-`World of Warcraft/_retail_/Interface/AddOns/`
-
-If you previously installed the standalone `SimplePartyHighlight`, disable or remove it after installing PGT 0.4.0 to avoid duplicate target highlight visuals.
-
-## Packaging
-
-On macOS, use the built-in Bash and `zip` tools; no Python installation is needed.
-Run from the repository root:
-
-```sh
-bash scripts/package.sh
-```
-
-The script reads the version and runtime file list from `PandahornGameplayToolbox.toc`
-and creates `dist/PandahornGameplayToolbox-<version>.zip`. It also works when invoked
-from another working directory. The ZIP contains a single `PandahornGameplayToolbox/`
-folder with only the manifest, its listed files, the `IconTexture`, and resources
-declared using `# Package: <relative path>` comments in the manifest; documentation, Git metadata,
-scripts, and development outputs are excluded. Missing or unsafe manifest paths
-stop packaging before replacing an existing ZIP. Extract the ZIP into
-`World of Warcraft/_retail_/Interface/AddOns/` to install.
-
-`Media/addon_icon.tga` supplies the in-game addon-list icon. Game-ready preview
-textures live under `Media/Previews/`; their original PNGs are kept under
-`assets/previews/` and excluded from the ZIP. The TGA previews preserve the original
-pixels on transparent power-of-two canvases; the UI crops the padding when displaying them.
-
-## Name format examples
-
-| Template | Example |
-|---|---|
-| `{spec} {class}` | `Holy Pal` |
-| `{spec} {class} {party}` | `Holy Pal P1` |
-| `{class} {party}` | `Pal P1` |
-| `{party} {spec} {class}` | `P1 Holy Pal` |
-| `{spec}-{class}-{party}` | `Holy-Pal-P1` |
-
-`{party}` maps to the WoW `party1` / `party2` / ... unit token number. If another addon visually re-sorts party frames, the token number may not equal the visible top-to-bottom position.
-
-## Architecture
-
-- `Core.lua` - lifecycle, ordered module initialization, SavedVariables, arena detection, callback bus and secret-value helpers.
-- `Data/Specs.lua` - specialization/class abbreviation data.
-- `Services/Inspect.lua` - throttled inspect queue and GUID -> specialization cache.
-- `Modules/FriendlyIdentity.lua` - party/target identity masking and format tokens.
-- `Modules/PartyTargetHighlight.lua` - current-target party frame border/glow module.
-- `Modules/NameplateTargetHighlight.lua` - event-driven enemy/friendly current-target nameplate border/glow module.
-- `UI/Settings.lua` - Blizzard Settings -> AddOns configuration page.
-
-Future functionality should be implemented as independent modules under `Modules/` and registered through `PGT:RegisterModule()`.
+如已安装旧版 `SimplePartyHighlight`，请禁用它以避免重复高亮。

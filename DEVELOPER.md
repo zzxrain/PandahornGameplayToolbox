@@ -4,7 +4,7 @@ Technical notes for addon maintainers. User instructions and screenshots are in 
 
 ## Runtime and validation
 
-The current addon version is 0.4.0, targeting WoW Retail 12.1 with `Interface: 120100`.
+The current addon version is 0.5.1, targeting WoW Retail 12.1 with `Interface: 120100`.
 The cloud environment has no WoW client; Lua loading and mocked checks cannot replace in-game validation.
 Before releasing, follow [TESTING.md](TESTING.md) to check settings, arena behavior, and third-party addon compatibility.
 Use BugSack / BugGrabber to capture full Lua error stacks.

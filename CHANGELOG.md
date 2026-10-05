@@ -1,9 +1,16 @@
 # Changelog
 
-## Unreleased
+## 0.5.1
 
 - Renamed the addon to Pandahorn Gameplay Toolbox, including its manifest, code namespace, SavedVariables table, callback identifiers, UI text, and documentation.
-- Kept all gameplay features and their behavior unchanged.
+- Removed the `/pgt` and `/pandahorngameplay` slash commands and their documentation; configuration is available through Blizzard Settings.
+- Kept status printing in the Settings UI and removed command-only settings shortcuts.
+- Added an in-game addon-list icon.
+- Added an executable macOS-compatible Shell packaging script that includes only the manifest, Lua runtime files, and addon icon, with file and path validation.
+- Simplified the English README with four smaller screenshots covering arena teammate names, party frame target highlighting, and nameplate target highlighting.
+- Moved packaging, architecture, and implementation notes into a separate developer guide.
+- Removed in-game screenshot preview buttons and preview textures; screenshots remain documentation-only and are excluded from release packages.
+- Preserved existing gameplay behavior and settings fields.
 
 ## 0.4.0
 

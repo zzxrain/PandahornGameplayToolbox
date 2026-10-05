@@ -1,9 +1,9 @@
 ## Interface: 120100
-## Title: Pandahorn PVP Helper
-## Notes: Modular PvP helper for identity masking and current-target highlighting.
+## Title: Pandahorn Gameplay Toolbox
+## Notes: Modular gameplay toolbox for identity masking and current-target highlighting.
 ## Author: Pandahorn
 ## Version: 0.4.0
-## SavedVariables: PandahornPVPHelperDB
+## SavedVariables: PandahornGameplayToolboxDB
 ## X-Category: PvP
 ## X-License: MIT
 

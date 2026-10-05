@@ -1,4 +1,4 @@
-local _, PPH = ...
+local _, PGT = ...
 
 local Inspect = {
     specByGUID = {},
@@ -10,7 +10,7 @@ local Inspect = {
     retryAt = 0,
 }
 
-PPH.Inspect = Inspect
+PGT.Inspect = Inspect
 
 local function GetInspectSpec(unit)
     if C_SpecializationInfo and C_SpecializationInfo.GetInspectSpecialization then
@@ -23,7 +23,7 @@ local function GetInspectSpec(unit)
 end
 
 function Inspect:GetSpecID(unit)
-    local guid = PPH:GetSafeUnitGUID(unit)
+    local guid = PGT:GetSafeUnitGUID(unit)
     if guid then
         local cached = self.specByGUID[guid]
         if cached then
@@ -32,7 +32,7 @@ function Inspect:GetSpecID(unit)
     end
 
     local ok, specID = pcall(GetInspectSpec, unit)
-    if not ok or PPH:IsSecret(specID) then
+    if not ok or PGT:IsSecret(specID) then
         return nil
     end
 
@@ -47,12 +47,12 @@ function Inspect:GetSpecID(unit)
 end
 
 function Inspect:GetClassFile(unit)
-    local guid = PPH:GetSafeUnitGUID(unit)
+    local guid = PGT:GetSafeUnitGUID(unit)
     if guid and self.classByGUID[guid] then
         return self.classByGUID[guid]
     end
 
-    local classFile = PPH:GetSafeClassFile(unit)
+    local classFile = PGT:GetSafeClassFile(unit)
     if classFile and guid then
         self.classByGUID[guid] = classFile
     end
@@ -60,17 +60,17 @@ function Inspect:GetClassFile(unit)
 end
 
 function Inspect:QueueUnit(unit, highPriority)
-    if not PPH.inArena or not unit then
+    if not PGT.inArena or not unit then
         return
     end
 
-    if PPH:IsPlayerUnit(unit) then
+    if PGT:IsPlayerUnit(unit) then
         return
     end
 
-    local exists = PPH:GetSafeBoolean(UnitExists, unit)
-    local isPlayer = PPH:GetSafeBoolean(UnitIsPlayer, unit)
-    local isFriend = PPH:GetSafeBoolean(UnitIsFriend, "player", unit)
+    local exists = PGT:GetSafeBoolean(UnitExists, unit)
+    local isPlayer = PGT:GetSafeBoolean(UnitIsPlayer, unit)
+    local isFriend = PGT:GetSafeBoolean(UnitIsFriend, "player", unit)
     if exists ~= true or isPlayer ~= true or isFriend ~= true then
         return
     end
@@ -79,7 +79,7 @@ function Inspect:QueueUnit(unit, highPriority)
         return
     end
 
-    local guid = PPH:GetSafeUnitGUID(unit)
+    local guid = PGT:GetSafeUnitGUID(unit)
     local key = guid or unit
     if self.queued[key] then
         return
@@ -97,7 +97,7 @@ function Inspect:QueueUnit(unit, highPriority)
 end
 
 function Inspect:QueueParty()
-    if not PPH.inArena then
+    if not PGT.inArena then
         return
     end
 
@@ -107,7 +107,7 @@ function Inspect:QueueParty()
 end
 
 function Inspect:Pump()
-    if self.pendingUnit or not PPH.inArena or #self.queue == 0 then
+    if self.pendingUnit or not PGT.inArena or #self.queue == 0 then
         return
     end
 
@@ -124,11 +124,11 @@ function Inspect:Pump()
         self.queued[entry.key] = nil
 
         if self:GetSpecID(entry.unit) then
-            PPH:Fire("PPH_INSPECT_UPDATED", entry.unit)
+            PGT:Fire("PGT_INSPECT_UPDATED", entry.unit)
         else
-            local canInspect = PPH:GetSafeBoolean(CanInspect, entry.unit, false)
+            local canInspect = PGT:GetSafeBoolean(CanInspect, entry.unit, false)
             if canInspect == true then
-                local guid = PPH:GetSafeUnitGUID(entry.unit)
+                local guid = PGT:GetSafeUnitGUID(entry.unit)
                 self.pendingUnit = entry.unit
                 self.pendingGUID = guid
                 self.retryAt = now + 1.5
@@ -160,7 +160,7 @@ function Inspect:OnInspectReady(_, guid)
         return
     end
 
-    if PPH:IsSecret(guid) then
+    if PGT:IsSecret(guid) then
         return
     end
 
@@ -170,7 +170,7 @@ function Inspect:OnInspectReady(_, guid)
 
     local unit = self.pendingUnit
     local specID = self:GetSpecID(unit)
-    local unitGUID = PPH:GetSafeUnitGUID(unit)
+    local unitGUID = PGT:GetSafeUnitGUID(unit)
     if specID and unitGUID then
         self.specByGUID[unitGUID] = specID
     end
@@ -182,7 +182,7 @@ function Inspect:OnInspectReady(_, guid)
         pcall(ClearInspectPlayer)
     end
 
-    PPH:Fire("PPH_INSPECT_UPDATED", unit)
+    PGT:Fire("PGT_INSPECT_UPDATED", unit)
     C_Timer.After(0.1, function()
         Inspect:Pump()
     end)
@@ -197,7 +197,7 @@ function Inspect:OnArenaStateChanged(_, active)
     if active then
         for _, delay in ipairs({ 0.5, 2.0, 5.0 }) do
             C_Timer.After(delay, function()
-                if PPH.inArena then
+                if PGT.inArena then
                     Inspect:QueueParty()
                 end
             end)
@@ -208,7 +208,7 @@ function Inspect:OnArenaStateChanged(_, active)
 end
 
 function Inspect:OnGroupRosterUpdate()
-    if PPH.inArena then
+    if PGT.inArena then
         C_Timer.After(0.25, function()
             Inspect:QueueParty()
         end)
@@ -216,16 +216,16 @@ function Inspect:OnGroupRosterUpdate()
 end
 
 function Inspect:OnTargetChanged()
-    if PPH.inArena then
+    if PGT.inArena then
         self:QueueUnit("target", true)
     end
 end
 
 function Inspect:OnInitialize()
-    PPH:RegisterCallback("INSPECT_READY", self, "OnInspectReady")
-    PPH:RegisterCallback("GROUP_ROSTER_UPDATE", self, "OnGroupRosterUpdate")
-    PPH:RegisterCallback("PLAYER_TARGET_CHANGED", self, "OnTargetChanged")
-    PPH:RegisterCallback("PPH_ARENA_STATE_CHANGED", self, "OnArenaStateChanged")
+    PGT:RegisterCallback("INSPECT_READY", self, "OnInspectReady")
+    PGT:RegisterCallback("GROUP_ROSTER_UPDATE", self, "OnGroupRosterUpdate")
+    PGT:RegisterCallback("PLAYER_TARGET_CHANGED", self, "OnTargetChanged")
+    PGT:RegisterCallback("PGT_ARENA_STATE_CHANGED", self, "OnArenaStateChanged")
 end
 
-PPH:RegisterModule("InspectService", Inspect)
+PGT:RegisterModule("InspectService", Inspect)

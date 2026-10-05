@@ -1,6 +1,6 @@
-# Pandahorn PVP Helper
+# Pandahorn Gameplay Toolbox
 
-A lightweight, modular World of Warcraft Retail PvP helper designed for Midnight / Patch 12.1.
+A lightweight, modular World of Warcraft Retail gameplay toolbox designed for Midnight / Patch 12.1.
 
 ## Version 0.4.0
 
@@ -17,7 +17,7 @@ Arena-only identity masking for friendly players.
 
 ### 2. Party Target Highlight
 
-Integrated from the standalone `SimplePartyHighlight` prototype as a separate PPH module.
+Integrated from the standalone `SimplePartyHighlight` prototype as a separate PGT module.
 
 - Highlights the Blizzard compact party/raid frame that represents your current target.
 - Uses Blizzard's existing `frame.selectionHighlight:IsShown()` state rather than directly re-evaluating target identity with `UnitIsUnit()`.
@@ -37,11 +37,11 @@ Integrated from the standalone `SimplePartyHighlight` prototype as a separate PP
 
 Open:
 
-`Esc -> Options -> AddOns -> Pandahorn PVP Helper`
+`Esc -> Options -> AddOns -> Pandahorn Gameplay Toolbox`
 
 or:
 
-`/pph settings`
+`/pgt settings`
 
 Settings are applied immediately.
 
@@ -56,11 +56,11 @@ Available sections:
 
 ## Installation
 
-Copy the `PandahornPVPHelper` folder to:
+Copy the `PandahornGameplayToolbox` folder to:
 
 `World of Warcraft/_retail_/Interface/AddOns/`
 
-If you previously installed the standalone `SimplePartyHighlight`, disable or remove it after installing PPH 0.4.0 to avoid duplicate target highlight visuals.
+If you previously installed the standalone `SimplePartyHighlight`, disable or remove it after installing PGT 0.4.0 to avoid duplicate target highlight visuals.
 
 ## Name format examples
 
@@ -76,24 +76,24 @@ If you previously installed the standalone `SimplePartyHighlight`, disable or re
 
 ## Commands
 
-- `/pph settings`
-- `/pph status`
-- `/pph on` / `/pph off`
-- `/pph party on` / `/pph party off`
-- `/pph target on` / `/pph target off`
-- `/pph format spec class`
-- `/pph format spec class party`
-- `/pph format {spec} {class} {party}`
-- `/pph partyprefix P`
-- `/pph partyprefix none`
-- `/pph fallback Ally`
-- `/pph highlight on` / `/pph highlight off`
-- `/pph highlight arena on` / `/pph highlight arena off`
-- `/pph highlight border on` / `/pph highlight border off`
-- `/pph highlight glow on` / `/pph highlight glow off`
-- `/pph preview`
-- `/pph debug on` / `/pph debug off`
-- `/pph reset`
+- `/pgt settings`
+- `/pgt status`
+- `/pgt on` / `/pgt off`
+- `/pgt party on` / `/pgt party off`
+- `/pgt target on` / `/pgt target off`
+- `/pgt format spec class`
+- `/pgt format spec class party`
+- `/pgt format {spec} {class} {party}`
+- `/pgt partyprefix P`
+- `/pgt partyprefix none`
+- `/pgt fallback Ally`
+- `/pgt highlight on` / `/pgt highlight off`
+- `/pgt highlight arena on` / `/pgt highlight arena off`
+- `/pgt highlight border on` / `/pgt highlight border off`
+- `/pgt highlight glow on` / `/pgt highlight glow off`
+- `/pgt preview`
+- `/pgt debug on` / `/pgt debug off`
+- `/pgt reset`
 
 ## Architecture
 
@@ -106,4 +106,4 @@ If you previously installed the standalone `SimplePartyHighlight`, disable or re
 - `UI/Settings.lua` - Blizzard Settings -> AddOns configuration page.
 - `Commands.lua` - slash-command configuration and diagnostics.
 
-Future functionality should be implemented as independent modules under `Modules/` and registered through `PPH:RegisterModule()`.
+Future functionality should be implemented as independent modules under `Modules/` and registered through `PGT:RegisterModule()`.

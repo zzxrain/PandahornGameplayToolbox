@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Renamed the addon to Pandahorn Gameplay Toolbox, including its manifest, code namespace, SavedVariables table, callback identifiers, UI text, slash commands, and documentation.
+- Kept all gameplay features and their behavior unchanged.
+
 ## 0.4.0
 
 - Added Settings UI controls for Party / Raid Frame highlight color, thickness, and contrast.
@@ -23,8 +28,8 @@
 
 ## 0.2.0
 
-- Added `Settings -> AddOns -> Pandahorn PVP Helper` configuration page.
-- Added `/pph settings` shortcut.
+- Added `Settings -> AddOns -> Pandahorn Gameplay Toolbox` configuration page.
+- Added `/pgt settings` shortcut.
 - Added GUI controls for Friendly Identity, party/target frame masking, name template, party prefix, fallback text and diagnostics.
 - Added quick identity-format presets while retaining editable `{spec}`, `{class}`, `{party}` templates.
 - Integrated `SimplePartyHighlight` as the new modular `PartyTargetHighlight` feature.
@@ -37,7 +42,7 @@
 
 ## 0.1.0
 
-- Initial framework for Pandahorn PVP Helper.
+- Initial framework for Pandahorn Gameplay Toolbox.
 - Arena-only Friendly Identity module.
 - Party-frame teammate name replacement, excluding the player.
 - Friendly target-frame name replacement.

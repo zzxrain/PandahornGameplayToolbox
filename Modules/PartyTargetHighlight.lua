@@ -1,4 +1,4 @@
-local _, PPH = ...
+local _, PGT = ...
 
 -- Integrated from the standalone SimplePartyHighlight prototype.
 -- The important safety property is preserved: selection state is read from
@@ -10,16 +10,16 @@ local PartyTargetHighlight = {
 }
 
 function PartyTargetHighlight:GetSettings()
-    return PPH.db and PPH.db.partyTargetHighlight
+    return PGT.db and PGT.db.partyTargetHighlight
 end
 
 function PartyTargetHighlight:IsActive()
     local db = self:GetSettings()
-    if not PPH.db or not PPH.db.enabled or not db or not db.enabled then
+    if not PGT.db or not PGT.db.enabled or not db or not db.enabled then
         return false
     end
 
-    if db.arenaOnly and not PPH.inArena then
+    if db.arenaOnly and not PGT.inArena then
         return false
     end
 
@@ -32,7 +32,7 @@ function PartyTargetHighlight:GetDisplayedUnit(frame)
     end
 
     local unit = frame.displayedUnit or frame.unit
-    if PPH:IsSecret(unit) or type(unit) ~= "string" then
+    if PGT:IsSecret(unit) or type(unit) ~= "string" then
         return nil
     end
     return unit
@@ -77,12 +77,12 @@ function PartyTargetHighlight:HideHighlight(frame)
         return
     end
 
-    if frame.PPH_TargetHighlightBorder then
-        frame.PPH_TargetHighlightBorder:Hide()
+    if frame.PGT_TargetHighlightBorder then
+        frame.PGT_TargetHighlightBorder:Hide()
     end
 
-    if frame.PPH_TargetHighlightGlow then
-        frame.PPH_TargetHighlightGlow:Hide()
+    if frame.PGT_TargetHighlightGlow then
+        frame.PGT_TargetHighlightGlow:Hide()
     end
 end
 
@@ -92,23 +92,23 @@ function PartyTargetHighlight:ShowHighlight(frame)
     end
 
     local db = self:GetSettings()
-    if db.showGlow and frame.PPH_TargetHighlightGlow then
-        frame.PPH_TargetHighlightGlow:Show()
-    elseif frame.PPH_TargetHighlightGlow then
-        frame.PPH_TargetHighlightGlow:Hide()
+    if db.showGlow and frame.PGT_TargetHighlightGlow then
+        frame.PGT_TargetHighlightGlow:Show()
+    elseif frame.PGT_TargetHighlightGlow then
+        frame.PGT_TargetHighlightGlow:Hide()
     end
 
-    if db.showBorder and frame.PPH_TargetHighlightBorder then
-        frame.PPH_TargetHighlightBorder:Show()
-    elseif frame.PPH_TargetHighlightBorder then
-        frame.PPH_TargetHighlightBorder:Hide()
+    if db.showBorder and frame.PGT_TargetHighlightBorder then
+        frame.PGT_TargetHighlightBorder:Show()
+    elseif frame.PGT_TargetHighlightBorder then
+        frame.PGT_TargetHighlightBorder:Hide()
     end
 end
 
 function PartyTargetHighlight:ApplyStyle(frame)
     local db = self:GetSettings()
-    local border = frame and frame.PPH_TargetHighlightBorder
-    local glow = frame and frame.PPH_TargetHighlightGlow
+    local border = frame and frame.PGT_TargetHighlightBorder
+    local glow = frame and frame.PGT_TargetHighlightGlow
     if not db or not border or not glow then
         return
     end
@@ -164,15 +164,15 @@ function PartyTargetHighlight:CreateHighlight(frame)
     border:SetBackdropBorderColor(unpack(db.borderColor or { 0.35, 1.00, 0.18, 1.00 }))
     border:Hide()
 
-    frame.PPH_TargetHighlightGlow = glow
-    frame.PPH_TargetHighlightBorder = border
+    frame.PGT_TargetHighlightGlow = glow
+    frame.PGT_TargetHighlightBorder = border
     self:ApplyStyle(frame)
     return border
 end
 
 function PartyTargetHighlight:GetOrCreateHighlight(frame)
-    if frame.PPH_TargetHighlightBorder and frame.PPH_TargetHighlightGlow then
-        return frame.PPH_TargetHighlightBorder
+    if frame.PGT_TargetHighlightBorder and frame.PGT_TargetHighlightGlow then
+        return frame.PGT_TargetHighlightBorder
     end
 
     if InCombatLockdown and InCombatLockdown() then
@@ -298,12 +298,12 @@ end
 function PartyTargetHighlight:OnInitialize()
     self:InstallHooks()
 
-    PPH:RegisterCallback("PLAYER_TARGET_CHANGED", self, "OnEvent")
-    PPH:RegisterCallback("GROUP_ROSTER_UPDATE", self, "OnEvent")
-    PPH:RegisterCallback("PLAYER_ENTERING_WORLD", self, "OnEvent")
-    PPH:RegisterCallback("PLAYER_REGEN_ENABLED", self, "OnEvent")
-    PPH:RegisterCallback("PPH_ARENA_STATE_CHANGED", self, "OnArenaStateChanged")
-    PPH:RegisterCallback("PPH_CONFIG_CHANGED", self, "OnConfigChanged")
+    PGT:RegisterCallback("PLAYER_TARGET_CHANGED", self, "OnEvent")
+    PGT:RegisterCallback("GROUP_ROSTER_UPDATE", self, "OnEvent")
+    PGT:RegisterCallback("PLAYER_ENTERING_WORLD", self, "OnEvent")
+    PGT:RegisterCallback("PLAYER_REGEN_ENABLED", self, "OnEvent")
+    PGT:RegisterCallback("PGT_ARENA_STATE_CHANGED", self, "OnArenaStateChanged")
+    PGT:RegisterCallback("PGT_CONFIG_CHANGED", self, "OnConfigChanged")
 
     local db = self:GetSettings()
     local delay = db and db.initialResyncDelay or 0.25
@@ -312,4 +312,4 @@ function PartyTargetHighlight:OnInitialize()
     end)
 end
 
-PPH:RegisterModule("PartyTargetHighlight", PartyTargetHighlight)
+PGT:RegisterModule("PartyTargetHighlight", PartyTargetHighlight)

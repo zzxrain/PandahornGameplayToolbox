@@ -1,4 +1,4 @@
-local _, PPH = ...
+local _, PGT = ...
 
 -- Nameplates are pooled, so only retain the currently highlighted plate and
 -- store the reusable visual directly on the plate. Target lookup is event-
@@ -9,12 +9,12 @@ local NameplateTargetHighlight = {
 }
 
 function NameplateTargetHighlight:GetSettings()
-    return PPH.db and PPH.db.nameplateTargetHighlight
+    return PGT.db and PGT.db.nameplateTargetHighlight
 end
 
 function NameplateTargetHighlight:IsActive()
     local db = self:GetSettings()
-    return PPH.db and PPH.db.enabled and db and db.enabled
+    return PGT.db and PGT.db.enabled and db and db.enabled
 end
 
 function NameplateTargetHighlight:GetTargetPlate()
@@ -23,7 +23,7 @@ function NameplateTargetHighlight:GetTargetPlate()
     end
 
     local ok, plate = pcall(C_NamePlate.GetNamePlateForUnit, "target")
-    if not ok or not plate or PPH:IsSecret(plate) then
+    if not ok or not plate or PGT:IsSecret(plate) then
         return nil
     end
     if plate.IsForbidden and plate:IsForbidden() then
@@ -42,7 +42,7 @@ function NameplateTargetHighlight:GetAnchor(plate)
 end
 
 function NameplateTargetHighlight:Hide(plate)
-    local visual = plate and plate.PPH_NameplateTargetHighlight
+    local visual = plate and plate.PGT_NameplateTargetHighlight
     if not visual then
         return
     end
@@ -79,7 +79,7 @@ function NameplateTargetHighlight:Create(plate, anchor)
         border = border,
         glow = glow,
     }
-    plate.PPH_NameplateTargetHighlight = visual
+    plate.PGT_NameplateTargetHighlight = visual
     return visual
 end
 
@@ -125,7 +125,7 @@ function NameplateTargetHighlight:Show(plate)
         return
     end
 
-    local visual = plate.PPH_NameplateTargetHighlight or self:Create(plate, anchor)
+    local visual = plate.PGT_NameplateTargetHighlight or self:Create(plate, anchor)
     if not visual then
         return
     end
@@ -175,7 +175,7 @@ end
 
 function NameplateTargetHighlight:OnNamePlateAdded()
     -- Defer once so Blizzard and nameplate skinning addons finish laying out
-    -- the newly acquired plate before the PPH overlay is positioned above it.
+    -- the newly acquired plate before the PGT overlay is positioned above it.
     self:ScheduleSync()
 end
 
@@ -188,11 +188,11 @@ function NameplateTargetHighlight:OnConfigChanged()
 end
 
 function NameplateTargetHighlight:OnInitialize()
-    PPH:RegisterCallback("NAME_PLATE_UNIT_ADDED", self, "OnNamePlateAdded")
-    PPH:RegisterCallback("NAME_PLATE_UNIT_REMOVED", self, "OnNamePlateRemoved")
-    PPH:RegisterCallback("PLAYER_TARGET_CHANGED", self, "ScheduleSync")
-    PPH:RegisterCallback("PLAYER_ENTERING_WORLD", self, "ScheduleSync")
-    PPH:RegisterCallback("PPH_CONFIG_CHANGED", self, "OnConfigChanged")
+    PGT:RegisterCallback("NAME_PLATE_UNIT_ADDED", self, "OnNamePlateAdded")
+    PGT:RegisterCallback("NAME_PLATE_UNIT_REMOVED", self, "OnNamePlateRemoved")
+    PGT:RegisterCallback("PLAYER_TARGET_CHANGED", self, "ScheduleSync")
+    PGT:RegisterCallback("PLAYER_ENTERING_WORLD", self, "ScheduleSync")
+    PGT:RegisterCallback("PGT_CONFIG_CHANGED", self, "OnConfigChanged")
 end
 
-PPH:RegisterModule("NameplateTargetHighlight", NameplateTargetHighlight)
+PGT:RegisterModule("NameplateTargetHighlight", NameplateTargetHighlight)

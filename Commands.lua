@@ -1,10 +1,10 @@
-local _, PPH = ...
+local _, PGT = ...
 
 local function OnOff(value)
     return value and "ON" or "OFF"
 end
 
-function PPH:PrintStatus()
+function PGT:PrintStatus()
     local fi = self.db.friendlyIdentity
     local hi = self.db.partyTargetHighlight
     local ni = self.db.nameplateTargetHighlight
@@ -30,23 +30,23 @@ function PPH:PrintStatus()
 end
 
 local function PrintHelp()
-    PPH:Print("Commands:")
-    PPH:Print("/pph settings")
-    PPH:Print("/pph status")
-    PPH:Print("/pph on | off")
-    PPH:Print("/pph party on | off")
-    PPH:Print("/pph target on | off")
-    PPH:Print("/pph format spec class [party]")
-    PPH:Print("/pph format {spec} {class} {party}")
-    PPH:Print("/pph partyprefix P   (use 'none' for no prefix)")
-    PPH:Print("/pph fallback Ally")
-    PPH:Print("/pph highlight on | off")
-    PPH:Print("/pph highlight arena on | off")
-    PPH:Print("/pph highlight border on | off")
-    PPH:Print("/pph highlight glow on | off")
-    PPH:Print("/pph preview")
-    PPH:Print("/pph debug on | off")
-    PPH:Print("/pph reset")
+    PGT:Print("Commands:")
+    PGT:Print("/pgt settings")
+    PGT:Print("/pgt status")
+    PGT:Print("/pgt on | off")
+    PGT:Print("/pgt party on | off")
+    PGT:Print("/pgt target on | off")
+    PGT:Print("/pgt format spec class [party]")
+    PGT:Print("/pgt format {spec} {class} {party}")
+    PGT:Print("/pgt partyprefix P   (use 'none' for no prefix)")
+    PGT:Print("/pgt fallback Ally")
+    PGT:Print("/pgt highlight on | off")
+    PGT:Print("/pgt highlight arena on | off")
+    PGT:Print("/pgt highlight border on | off")
+    PGT:Print("/pgt highlight glow on | off")
+    PGT:Print("/pgt preview")
+    PGT:Print("/pgt debug on | off")
+    PGT:Print("/pgt reset")
 end
 
 local function ParseOnOff(value)
@@ -59,10 +59,10 @@ local function ParseOnOff(value)
     return nil
 end
 
-SLASH_PANDAHORNPVPHELPER1 = "/pph"
-SLASH_PANDAHORNPVPHELPER2 = "/pandahornpvp"
+SLASH_PANDAHORNGAMEPLAYTOOLBOX1 = "/pgt"
+SLASH_PANDAHORNGAMEPLAYTOOLBOX2 = "/pandahorngameplay"
 
-SlashCmdList.PANDAHORNPVPHELPER = function(message)
+SlashCmdList.PANDAHORNGAMEPLAYTOOLBOX = function(message)
     local command, rest = message:match("^(%S*)%s*(.-)%s*$")
     command = (command or ""):lower()
     rest = rest or ""
@@ -73,51 +73,51 @@ SlashCmdList.PANDAHORNPVPHELPER = function(message)
     end
 
     if command == "settings" or command == "config" or command == "options" then
-        if not (PPH.SettingsUI and PPH.SettingsUI:Open()) then
-            PPH:Print("Settings panel is not available yet.")
+        if not (PGT.SettingsUI and PGT.SettingsUI:Open()) then
+            PGT:Print("Settings panel is not available yet.")
         end
         return
     end
 
     if command == "status" then
-        PPH:PrintStatus()
+        PGT:PrintStatus()
         return
     end
 
     if command == "on" or command == "off" then
-        PPH.db.enabled = command == "on"
-        PPH:Refresh("slash")
-        PPH:PrintStatus()
+        PGT.db.enabled = command == "on"
+        PGT:Refresh("slash")
+        PGT:PrintStatus()
         return
     end
 
     if command == "party" or command == "target" then
         local value = ParseOnOff(rest)
         if value == nil then
-            PPH:Print("Usage: /pph " .. command .. " on|off")
+            PGT:Print("Usage: /pgt " .. command .. " on|off")
             return
         end
 
         if command == "party" then
-            PPH.db.friendlyIdentity.partyFrames = value
+            PGT.db.friendlyIdentity.partyFrames = value
         else
-            PPH.db.friendlyIdentity.targetFrame = value
+            PGT.db.friendlyIdentity.targetFrame = value
         end
-        PPH:Refresh("slash")
-        PPH:PrintStatus()
+        PGT:Refresh("slash")
+        PGT:PrintStatus()
         return
     end
 
     if command == "format" then
-        local module = PPH.modules.FriendlyIdentity
+        local module = PGT.modules.FriendlyIdentity
         local normalized = module and module:NormalizeFormat(rest) or nil
         if not normalized then
-            PPH:Print("Invalid format. Tokens: spec, class, party; or use {spec} {class} {party}.")
+            PGT:Print("Invalid format. Tokens: spec, class, party; or use {spec} {class} {party}.")
             return
         end
-        PPH.db.friendlyIdentity.format = normalized
-        PPH:Refresh("slash")
-        PPH:Print("Format set to: |cffffffff" .. normalized .. "|r")
+        PGT.db.friendlyIdentity.format = normalized
+        PGT:Refresh("slash")
+        PGT:Print("Format set to: |cffffffff" .. normalized .. "|r")
         return
     end
 
@@ -126,21 +126,21 @@ SlashCmdList.PANDAHORNPVPHELPER = function(message)
         if value:lower() == "none" then
             value = ""
         end
-        PPH.db.friendlyIdentity.partyPrefix = value
-        PPH:Refresh("slash")
-        PPH:Print("Party prefix set to: |cffffffff" .. (value == "" and "<none>" or value) .. "|r")
+        PGT.db.friendlyIdentity.partyPrefix = value
+        PGT:Refresh("slash")
+        PGT:Print("Party prefix set to: |cffffffff" .. (value == "" and "<none>" or value) .. "|r")
         return
     end
 
     if command == "fallback" then
         local value = rest:gsub("^%s+", ""):gsub("%s+$", "")
         if value == "" then
-            PPH:Print("Usage: /pph fallback Ally")
+            PGT:Print("Usage: /pgt fallback Ally")
             return
         end
-        PPH.db.friendlyIdentity.fallbackText = value
-        PPH:Refresh("slash")
-        PPH:Print("Fallback text set to: |cffffffff" .. value .. "|r")
+        PGT.db.friendlyIdentity.fallbackText = value
+        PGT:Refresh("slash")
+        PGT:Print("Fallback text set to: |cffffffff" .. value .. "|r")
         return
     end
 
@@ -150,52 +150,52 @@ SlashCmdList.PANDAHORNPVPHELPER = function(message)
         valueText = valueText or ""
 
         if subcommand == "on" or subcommand == "off" then
-            PPH.db.partyTargetHighlight.enabled = subcommand == "on"
+            PGT.db.partyTargetHighlight.enabled = subcommand == "on"
         elseif subcommand == "arena" or subcommand == "border" or subcommand == "glow" then
             local value = ParseOnOff(valueText)
             if value == nil then
-                PPH:Print("Usage: /pph highlight " .. subcommand .. " on|off")
+                PGT:Print("Usage: /pgt highlight " .. subcommand .. " on|off")
                 return
             end
             if subcommand == "arena" then
-                PPH.db.partyTargetHighlight.arenaOnly = value
+                PGT.db.partyTargetHighlight.arenaOnly = value
             elseif subcommand == "border" then
-                PPH.db.partyTargetHighlight.showBorder = value
+                PGT.db.partyTargetHighlight.showBorder = value
             else
-                PPH.db.partyTargetHighlight.showGlow = value
+                PGT.db.partyTargetHighlight.showGlow = value
             end
         else
-            PPH:Print("Usage: /pph highlight on|off | arena on|off | border on|off | glow on|off")
+            PGT:Print("Usage: /pgt highlight on|off | arena on|off | border on|off | glow on|off")
             return
         end
 
-        PPH:Refresh("slash")
-        PPH:PrintStatus()
+        PGT:Refresh("slash")
+        PGT:PrintStatus()
         return
     end
 
     if command == "preview" then
-        local module = PPH.modules.FriendlyIdentity
+        local module = PGT.modules.FriendlyIdentity
         local preview = module and module:GetPreview() or "Holy Pal"
-        PPH:Print("Preview: |cffffffff" .. preview .. "|r")
+        PGT:Print("Preview: |cffffffff" .. preview .. "|r")
         return
     end
 
     if command == "debug" then
         local value = ParseOnOff(rest)
         if value == nil then
-            PPH:Print("Usage: /pph debug on|off")
+            PGT:Print("Usage: /pgt debug on|off")
             return
         end
-        PPH.db.debug = value
-        PPH:Refresh("slash")
-        PPH:Print("Debug: " .. OnOff(PPH.db.debug))
+        PGT.db.debug = value
+        PGT:Refresh("slash")
+        PGT:Print("Debug: " .. OnOff(PGT.db.debug))
         return
     end
 
     if command == "reset" then
-        PPH:ResetToDefaults()
-        PPH:Print("Settings reset to defaults.")
+        PGT:ResetToDefaults()
+        PGT:Print("Settings reset to defaults.")
         return
     end
 

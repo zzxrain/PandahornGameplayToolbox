@@ -1,8 +1,8 @@
-local _, PPH = ...
+local _, PGT = ...
 
 -- English PvP-friendly abbreviations are intentionally keyed by specialization ID,
 -- so the output is stable even on non-English WoW clients.
-PPH.SpecData = {
+PGT.SpecData = {
     -- Death Knight
     [250] = { spec = "Blood",  class = "DK",     classFile = "DEATHKNIGHT" },
     [251] = { spec = "Frost",  class = "DK",     classFile = "DEATHKNIGHT" },
@@ -70,7 +70,7 @@ PPH.SpecData = {
     [73] = { spec = "Prot", class = "War", classFile = "WARRIOR" },
 }
 
-PPH.ClassAbbreviations = {
+PGT.ClassAbbreviations = {
     DEATHKNIGHT = "DK",
     DEMONHUNTER = "DH",
     DRUID = "Druid",

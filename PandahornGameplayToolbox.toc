@@ -4,8 +4,14 @@
 ## Author: Pandahorn
 ## Version: 0.4.0
 ## SavedVariables: PandahornGameplayToolboxDB
+## IconTexture: Interface\AddOns\PandahornGameplayToolbox\Media\addon_icon.tga
 ## X-Category: PvP
 ## X-License: MIT
+
+# Package: Media/Previews/Arena_Party_Frame_Rename.tga
+# Package: Media/Previews/Party_Raid_Frame_Highlight.tga
+# Package: Media/Previews/Target_HighLight_1.tga
+# Package: Media/Previews/Target_HighLight_2.tga
 
 Core.lua
 Data/Specs.lua

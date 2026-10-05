@@ -58,6 +58,23 @@ Copy the `PandahornGameplayToolbox` folder to:
 
 If you previously installed the standalone `SimplePartyHighlight`, disable or remove it after installing PGT 0.4.0 to avoid duplicate target highlight visuals.
 
+## Packaging
+
+On macOS, use the built-in Bash and `zip` tools; no Python installation is needed.
+Run from the repository root:
+
+```sh
+bash scripts/package.sh
+```
+
+The script reads the version and runtime file list from `PandahornGameplayToolbox.toc`
+and creates `dist/PandahornGameplayToolbox-<version>.zip`. It also works when invoked
+from another working directory. The ZIP contains a single `PandahornGameplayToolbox/`
+folder with only the manifest and its listed files; documentation, Git metadata,
+scripts, and development outputs are excluded. Missing or unsafe manifest paths
+stop packaging before replacing an existing ZIP. Extract the ZIP into
+`World of Warcraft/_retail_/Interface/AddOns/` to install.
+
 ## Name format examples
 
 | Template | Example |

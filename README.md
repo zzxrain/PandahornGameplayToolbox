@@ -26,5 +26,3 @@ Add a clear border and glow to your current enemy or friendly target's nameplate
 Extract the release ZIP into `World of Warcraft/_retail_/Interface/AddOns/`, with the addon inside a `PandahornGameplayToolbox` folder.
 
 Open **Esc → Options → AddOns → Pandahorn Gameplay Toolbox** to adjust feature toggles, name formats, and highlight styles. Changes apply immediately.
-
-If you use the old standalone `SimplePartyHighlight` addon, disable it to avoid duplicate highlights.

@@ -1,63 +1,63 @@
-# 开发与维护
+# Development and maintenance
 
-面向插件开发者的技术说明；使用说明及效果截图见 [README](README.md)。
+Technical notes for addon maintainers. User instructions and screenshots are in [README](README.md).
 
-## 运行环境与验证
+## Runtime and validation
 
-插件当前版本为 0.4.0，目标为 WoW Retail 12.1，清单标注 `Interface: 120100`。
-云环境没有 WoW 客户端，Lua 加载和模拟检查不能代替游戏内验证。
-发布前按 [TESTING.md](TESTING.md) 检查设置、竞技场行为及第三方插件兼容性。
-BugSack / BugGrabber 可用于收集完整 Lua 错误堆栈。
+The current addon version is 0.4.0, targeting WoW Retail 12.1 with `Interface: 120100`.
+The cloud environment has no WoW client; Lua loading and mocked checks cannot replace in-game validation.
+Before releasing, follow [TESTING.md](TESTING.md) to check settings, arena behavior, and third-party addon compatibility.
+Use BugSack / BugGrabber to capture full Lua error stacks.
 
-## 打包
+## Packaging
 
-macOS 使用系统自带 Bash 和 `zip`，无需 Python。在仓库根目录运行：
+On macOS, use the built-in Bash and `zip` tools; no Python is required. From the repository root:
 
 ```sh
 ./scripts/package.sh
 ```
 
-脚本也支持从其他工作目录调用。版本号及 Lua 文件列表来自 `.toc`，
-同时收集 `## IconTexture:` 指向的插件内图标。
-输出为 `dist/PandahornGameplayToolbox-<version>.zip`，最外层目录为 `PandahornGameplayToolbox/`。
-当前包只包含清单、7 个 Lua 文件和 `Media/addon_icon.tga`，共 9 个文件。
+The script also works from other working directories. It reads the version and Lua file list from the `.toc`
+and includes the addon-local icon referenced by `## IconTexture:`.
+Output: `dist/PandahornGameplayToolbox-<version>.zip`, with `PandahornGameplayToolbox/` as the top-level folder.
+The current package contains only the manifest, seven Lua files, and `Media/addon_icon.tga`: nine files total.
 
-脚本在创建安装包前验证文件存在性和路径，拒绝符号链接，成功后才替换已有 ZIP。
-文档、截图原图、Git 元数据、脚本及开发输出均不进入安装包。
+The script validates files and paths, rejects symlinks, and replaces the previous ZIP only after packaging succeeds.
+Documentation, source screenshots, Git metadata, scripts, and development outputs are excluded.
 
-## 图片资源
+## Image resources
 
-- `Media/addon_icon.tga`：游戏内插件列表图标，由 `.toc` 的 `IconTexture` 指定。
-- `assets/previews/*.png`：README 功能截图，保留用户提供的原图，仅用于文档。
+- `Media/addon_icon.tga`: in-game addon-list icon, referenced by the manifest's `IconTexture` field.
+- `assets/previews/*.png`: original screenshots for the README only. HTML width attributes reduce their displayed size without modifying the source images.
 
-## 架构
+## Architecture
 
-| 文件 | 职责 |
+| File | Responsibility |
 | --- | --- |
-| `Core.lua` | 生命周期、按顺序初始化模块、SavedVariables、竞技场检测、回调及 secret-value 安全处理 |
-| `Data/Specs.lua` | 职业与专精简称 |
-| `Services/Inspect.lua` | 节流 inspect 队列、GUID 与专精缓存 |
-| `Modules/FriendlyIdentity.lua` | 队友／目标框架重命名及格式解析 |
-| `Modules/PartyTargetHighlight.lua` | 小队框架当前目标边框与外发光 |
-| `Modules/NameplateTargetHighlight.lua` | 当前目标姓名板高亮 |
-| `UI/Settings.lua` | Blizzard Settings 设置页面 |
+| `Core.lua` | Lifecycle, ordered module initialization, SavedVariables, arena detection, callbacks, and secret-value helpers |
+| `Data/Specs.lua` | Specialization and class abbreviations |
+| `Services/Inspect.lua` | Throttled inspect queue and GUID-to-specialization cache |
+| `Modules/FriendlyIdentity.lua` | Party / target identity masking and format parsing |
+| `Modules/PartyTargetHighlight.lua` | Current-target party frame border and glow |
+| `Modules/NameplateTargetHighlight.lua` | Current-target nameplate highlighting |
+| `UI/Settings.lua` | Blizzard Settings configuration page |
 
-新功能通过 `PGT:RegisterModule()` 注册独立模块。设置保存于 `PandahornGameplayToolboxDB`，
-当前 `dbVersion = 4`，初始化保留已有设置并补充缺失的默认值。
+Register independent modules through `PGT:RegisterModule()`.
+Settings are stored in `PandahornGameplayToolboxDB`, currently with `dbVersion = 4`.
+Initialization preserves existing settings and fills in missing defaults.
 
-## 行为细节
+## Behavior details
 
-Friendly Identity 仅在竞技场生效，专精通过 inspect API 获取并按 GUID 缓存。
-专精尚不可用时回退为职业、队友编号或 `Ally`，避免在遮蔽状态下显示队友真实姓名。
+Friendly Identity runs only in arenas. Specializations come from the inspect API and are cached by GUID.
+Until specialization data is available, labels fall back to class, party number, or `Ally` to avoid revealing teammate names while masking is active.
 
-Party Target Highlight 使用暴雪 `selectionHighlight:IsShown()` 判断选中状态，
-避免额外调用 `UnitIsUnit()`。姓名板高亮采用事件驱动，保留单个活动姓名板引用，
-不做逐帧扫描；独立高层覆盖用于与 BetterBlizzPlates 等姓名板皮肤配合。
-实际兼容性仍需在游戏中验证。
+Party Target Highlight uses Blizzard's `selectionHighlight:IsShown()` state to avoid extra `UnitIsUnit()` calls.
+Nameplate highlighting is event-driven, retains a single active-nameplate reference, and does not scan every frame.
+Its independent high-level overlay is designed to work with skins such as BetterBlizzPlates; verify compatibility in-game.
 
-姓名格式支持 `{spec}`、`{class}`、`{party}`：
+Name formats support `{spec}`, `{class}`, and `{party}`:
 
-| 模板 | 示例 |
+| Template | Example |
 | --- | --- |
 | `{spec} {class}` | `Holy Pal` |
 | `{spec} {class} {party}` | `Holy Pal P1` |
@@ -65,4 +65,4 @@ Party Target Highlight 使用暴雪 `selectionHighlight:IsShown()` 判断选中�
 | `{party} {spec} {class}` | `P1 Holy Pal` |
 | `{spec}-{class}-{party}` | `Holy-Pal-P1` |
 
-`{party}` 对应 `party1` / `party2` 等单位编号；其他插件重排框架时，编号可能与屏幕顺序不同。
+`{party}` maps to unit tokens such as `party1` and `party2`; addons that reorder frames may display them in a different order.

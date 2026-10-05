@@ -1,31 +1,30 @@
 # Pandahorn Gameplay Toolbox
 
-轻量的魔兽世界正式服 PvP 插件：看清队友职业专精，快速找到当前选中的目标。
+A lightweight World of Warcraft Retail PvP addon for identifying teammates and spotting your current target.
 
-## 竞技场队友重命名
+## Arena teammate names
 
-进入竞技场后，将队友框架和友方目标框架中的姓名替换为职业专精，例如 `Holy Pal`。默认保留自己的名字，离开竞技场后恢复原名。
+In arenas, replace teammate names on party frames and the friendly Target Frame with specialization and class, such as `Holy Pal`. Your own name stays unchanged by default; normal names return when you leave the arena.
 
-![竞技场队友框架重命名](assets/previews/Arena_Party_Frame_Rename.png)
+<img src="assets/previews/Arena_Party_Frame_Rename.png" alt="Arena teammate names" width="240">
 
-## 队友框架目标高亮
+## Party frame target highlight
 
-选中队友时，高亮对应的暴雪小队／团队式小队框架，便于确认当前目标。默认仅在竞技场启用，也可在设置中开启其他场景。
+Highlight your selected teammate on Blizzard party / raid-style party frames. Arena-only by default, with an option to enable it elsewhere.
 
-![队友框架选中目标高亮](assets/previews/Party_Raid_Frame_Highlight.png)
+<img src="assets/previews/Party_Raid_Frame_Highlight.png" alt="Party frame target highlight" width="280">
 
-## 姓名板目标高亮
+## Nameplate target highlight
 
-为当前目标的姓名板添加醒目的边框和外发光，适用于敌方和友方目标。可与队友框架高亮独立开关、调整颜色和粗细。
+Add a clear border and glow to your current enemy or friendly target's nameplate. Configure it independently from party frame highlighting, including color and thickness.
 
-![姓名板目标高亮示例一](assets/previews/Target_HighLight_1.png)
+<img src="assets/previews/Target_HighLight_1.png" alt="Nameplate target highlight example 1" width="240">
+<img src="assets/previews/Target_HighLight_2.png" alt="Nameplate target highlight example 2" width="360">
 
-![姓名板目标高亮示例二](assets/previews/Target_HighLight_2.png)
+## Installation and settings
 
-## 安装与设置
+Extract the release ZIP into `World of Warcraft/_retail_/Interface/AddOns/`, with the addon inside a `PandahornGameplayToolbox` folder.
 
-将安装包解压到 `World of Warcraft/_retail_/Interface/AddOns/`，确认其中有 `PandahornGameplayToolbox` 文件夹。
+Open **Esc → Options → AddOns → Pandahorn Gameplay Toolbox** to adjust feature toggles, name formats, and highlight styles. Changes apply immediately.
 
-游戏内打开 **Esc → Options → AddOns → Pandahorn Gameplay Toolbox**。设置即时生效，可调整开关、姓名格式和高亮样式。
-
-如已安装旧版 `SimplePartyHighlight`，请禁用它以避免重复高亮。
+If you use the old standalone `SimplePartyHighlight` addon, disable it to avoid duplicate highlights.

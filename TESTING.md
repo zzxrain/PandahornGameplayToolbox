@@ -7,7 +7,6 @@ Because the addon cannot be executed against a real WoW client in this build env
 1. Log in with PGT enabled.
 2. Open `Esc -> Options -> AddOns -> Pandahorn Gameplay Toolbox`.
 3. Confirm all sections render without Lua errors.
-4. Run `/pgt settings` and confirm it opens the same category.
 
 ## B. Friendly Identity - outside arena
 
@@ -64,7 +63,7 @@ Because the addon cannot be executed against a real WoW client in this build env
 4. Resize nameplates through BetterBlizzPlates and confirm the PGT highlight remains anchored to the health bar.
 5. Keep BugSack + BugGrabber enabled for the first few matches.
 6. If an error occurs, capture the full Lua stack plus the action that triggered it.
-7. `/pgt debug on` can be used for additional state messages.
+7. Enable `Debug messages` in the Settings UI for additional state messages.
 
 ## 0.2.1 Regression
 

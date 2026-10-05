@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Renamed the addon to Pandahorn Gameplay Toolbox, including its manifest, code namespace, SavedVariables table, callback identifiers, UI text, slash commands, and documentation.
+- Renamed the addon to Pandahorn Gameplay Toolbox, including its manifest, code namespace, SavedVariables table, callback identifiers, UI text, and documentation.
 - Kept all gameplay features and their behavior unchanged.
 
 ## 0.4.0
@@ -29,7 +29,6 @@
 ## 0.2.0
 
 - Added `Settings -> AddOns -> Pandahorn Gameplay Toolbox` configuration page.
-- Added `/pgt settings` shortcut.
 - Added GUI controls for Friendly Identity, party/target frame masking, name template, party prefix, fallback text and diagnostics.
 - Added quick identity-format presets while retaining editable `{spec}`, `{class}`, `{party}` templates.
 - Integrated `SimplePartyHighlight` as the new modular `PartyTargetHighlight` feature.

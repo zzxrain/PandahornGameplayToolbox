@@ -4,7 +4,6 @@ local SettingsUI = {
     controls = {},
     panel = nil,
     category = nil,
-    categoryID = nil,
 }
 
 PGT.SettingsUI = SettingsUI
@@ -614,11 +613,7 @@ function SettingsUI:BuildPanel()
     end)
 
     CreateButton(content, "Print status", 150, -1052, 110, function()
-        if PGT.PrintStatus then
-            PGT:PrintStatus()
-        else
-            PGT:Print("v" .. PGT.version .. " | arena=" .. tostring(PGT.inArena))
-        end
+        SettingsUI:PrintStatus()
     end)
 
     panel.OnRefresh = function()
@@ -655,16 +650,35 @@ function SettingsUI:RegisterSettingsCategory()
     Settings.RegisterAddOnCategory(category)
 
     self.category = category
-    self.categoryID = category:GetID()
-    PGT.settingsCategoryID = self.categoryID
 end
 
-function SettingsUI:Open()
-    if self.categoryID and _G.Settings and Settings.OpenToCategory then
-        Settings.OpenToCategory(self.categoryID)
-        return true
-    end
-    return false
+local function OnOff(value)
+    return value and "ON" or "OFF"
+end
+
+function SettingsUI:PrintStatus()
+    local fi = PGT.db.friendlyIdentity
+    local hi = PGT.db.partyTargetHighlight
+    local ni = PGT.db.nameplateTargetHighlight
+
+    PGT:Print("v" .. PGT.version
+        .. " | addon=" .. OnOff(PGT.db.enabled)
+        .. " | arena=" .. OnOff(PGT.inArena))
+    PGT:Print("Friendly Identity: " .. OnOff(fi.enabled)
+        .. " | party=" .. OnOff(fi.partyFrames)
+        .. " | target=" .. OnOff(fi.targetFrame)
+        .. " | format=|cffffffff" .. fi.format .. "|r")
+    PGT:Print("Party Target Highlight: " .. OnOff(hi.enabled)
+        .. " | arenaOnly=" .. OnOff(hi.arenaOnly)
+        .. " | border=" .. OnOff(hi.showBorder)
+        .. " | glow=" .. OnOff(hi.showGlow)
+        .. " | thickness=" .. tostring(hi.thickness)
+        .. " | contrast=" .. tostring(hi.contrast))
+    PGT:Print("Nameplate Target Highlight: " .. OnOff(ni.enabled)
+        .. " | border=" .. OnOff(ni.showBorder)
+        .. " | glow=" .. OnOff(ni.showGlow)
+        .. " | thickness=" .. tostring(ni.thickness)
+        .. " | contrast=" .. tostring(ni.contrast))
 end
 
 function SettingsUI:OnConfigChanged()

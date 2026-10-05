@@ -14,4 +14,3 @@ Modules/FriendlyIdentity.lua
 Modules/PartyTargetHighlight.lua
 Modules/NameplateTargetHighlight.lua
 UI/Settings.lua
-Commands.lua

@@ -1,4 +1,4 @@
-local _, PPH = ...
+local _, PGT = ...
 
 local SettingsUI = {
     controls = {},
@@ -7,7 +7,7 @@ local SettingsUI = {
     categoryID = nil,
 }
 
-PPH.SettingsUI = SettingsUI
+PGT.SettingsUI = SettingsUI
 
 local function AddTooltip(frame, text)
     if not text or text == "" then
@@ -58,7 +58,7 @@ local function CreateCheckbox(parent, labelText, tooltip, x, y, getter, setter)
     check:SetScript("OnClick", function(self)
         if self.setter then
             self.setter(self:GetChecked() and true or false)
-            PPH:Refresh("settings")
+            PGT:Refresh("settings")
         end
     end)
 
@@ -106,7 +106,7 @@ local function CreateEditBox(parent, labelText, tooltip, x, y, width, getter, se
         if accepted == false and self.getter then
             self:SetText(self.getter() or "")
         end
-        PPH:Refresh("settings")
+        PGT:Refresh("settings")
         self:ClearFocus()
     end
 
@@ -175,7 +175,7 @@ local function CreateSlider(parent, labelText, tooltip, x, y, width, minimum, ma
         self.Text:SetText(labelText .. ": " .. value)
         if userInput and self.setter then
             self.setter(value)
-            PPH:Refresh("settings")
+            PGT:Refresh("settings")
         end
     end)
 
@@ -232,7 +232,7 @@ local function CreateColorButton(parent, labelText, tooltip, x, y, getter, sette
             local r, g, b = ColorPickerFrame:GetColorRGB()
             self.setter({ r, g, b })
             self:Refresh()
-            PPH:Refresh("settings-color")
+            PGT:Refresh("settings-color")
         end
         local info = {
             r = previous[1], g = previous[2], b = previous[3],
@@ -241,7 +241,7 @@ local function CreateColorButton(parent, labelText, tooltip, x, y, getter, sette
             cancelFunc = function()
                 self.setter(previous)
                 self:Refresh()
-                PPH:Refresh("settings-color-cancel")
+                PGT:Refresh("settings-color-cancel")
             end,
         }
         ColorPickerFrame:SetupColorPickerAndShow(info)
@@ -256,7 +256,7 @@ function SettingsUI:RegisterControl(control)
 end
 
 function SettingsUI:RefreshControls()
-    if not PPH.db then
+    if not PGT.db then
         return
     end
 
@@ -266,10 +266,10 @@ function SettingsUI:RefreshControls()
         end
     end
 
-    local globalEnabled = PPH.db.enabled
-    local fi = PPH.db.friendlyIdentity
-    local hi = PPH.db.partyTargetHighlight
-    local ni = PPH.db.nameplateTargetHighlight
+    local globalEnabled = PGT.db.enabled
+    local fi = PGT.db.friendlyIdentity
+    local hi = PGT.db.partyTargetHighlight
+    local ni = PGT.db.nameplateTargetHighlight
 
     if self.fiEnabled then
         self.fiEnabled:SetControlEnabled(globalEnabled)
@@ -296,19 +296,19 @@ function SettingsUI:RefreshControls()
     end
 
     if self.previewText then
-        local module = PPH.modules.FriendlyIdentity
+        local module = PGT.modules.FriendlyIdentity
         local preview = module and module:GetPreview() or "Holy Pal"
         self.previewText:SetText("Preview: |cffffffff" .. preview .. "|r")
     end
 
     if self.statusText then
-        self.statusText:SetText("Arena detected: " .. (PPH.inArena and "|cff55ff55YES|r" or "|cffffaa55NO|r"))
+        self.statusText:SetText("Arena detected: " .. (PGT.inArena and "|cff55ff55YES|r" or "|cffffaa55NO|r"))
     end
 end
 
 function SettingsUI:BuildPanel()
     local panel = CreateFrame("Frame")
-    panel.name = PPH.name
+    panel.name = PGT.name
     self.panel = panel
 
     local scroll = CreateFrame("ScrollFrame", nil, panel, "UIPanelScrollFrameTemplate")
@@ -328,27 +328,27 @@ function SettingsUI:BuildPanel()
 
     local title = content:CreateFontString(nil, "ARTWORK", "GameFontNormalHuge")
     title:SetPoint("TOPLEFT", content, "TOPLEFT", 18, -16)
-    title:SetText(PPH.name)
+    title:SetText(PGT.name)
 
     local version = content:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     version:SetPoint("LEFT", title, "RIGHT", 10, -2)
-    version:SetText("v" .. PPH.version)
+    version:SetText("v" .. PGT.version)
 
     local description = content:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     description:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
     description:SetWidth(650)
     description:SetJustifyH("LEFT")
-    description:SetText("Modular PvP helper. Friendly identity masking is arena-only. Party target highlight can be limited to arenas or enabled everywhere.")
+    description:SetText("Modular gameplay toolbox. Friendly identity masking is arena-only. Party target highlight can be limited to arenas or enabled everywhere.")
 
     CreateSection(content, "General", 18, -82)
 
     self.masterEnabled = self:RegisterControl(CreateCheckbox(
         content,
-        "Enable Pandahorn PVP Helper",
-        "Master switch for all PPH modules.",
+        "Enable Pandahorn Gameplay Toolbox",
+        "Master switch for all PGT modules.",
         22, -116,
-        function() return PPH.db.enabled end,
-        function(value) PPH.db.enabled = value end
+        function() return PGT.db.enabled end,
+        function(value) PGT.db.enabled = value end
     ))
 
     CreateSection(content, "Friendly Identity", 18, -160)
@@ -358,8 +358,8 @@ function SettingsUI:BuildPanel()
         "Enable Friendly Identity",
         "Replaces friendly player names with specialization/class identity text. This module only activates in arena instances.",
         22, -194,
-        function() return PPH.db.friendlyIdentity.enabled end,
-        function(value) PPH.db.friendlyIdentity.enabled = value end
+        function() return PGT.db.friendlyIdentity.enabled end,
+        function(value) PGT.db.friendlyIdentity.enabled = value end
     ))
 
     self.fiChildren = {}
@@ -369,8 +369,8 @@ function SettingsUI:BuildPanel()
         "Replace teammate names on Party / Raid-style Party Frames",
         "Changes teammate names such as a Holy Paladin to the configured identity string.",
         46, -226,
-        function() return PPH.db.friendlyIdentity.partyFrames end,
-        function(value) PPH.db.friendlyIdentity.partyFrames = value end
+        function() return PGT.db.friendlyIdentity.partyFrames end,
+        function(value) PGT.db.friendlyIdentity.partyFrames = value end
     ))
     table.insert(self.fiChildren, partyFrames)
 
@@ -379,8 +379,8 @@ function SettingsUI:BuildPanel()
         "Replace friendly player name on Target Frame",
         "When your target is a friendly player in arena, replace the real name with the same identity format.",
         46, -256,
-        function() return PPH.db.friendlyIdentity.targetFrame end,
-        function(value) PPH.db.friendlyIdentity.targetFrame = value end
+        function() return PGT.db.friendlyIdentity.targetFrame end,
+        function(value) PGT.db.friendlyIdentity.targetFrame = value end
     ))
     table.insert(self.fiChildren, targetFrame)
 
@@ -389,8 +389,8 @@ function SettingsUI:BuildPanel()
         "Keep my own player name",
         "Your own name remains unchanged when you target yourself or when your own compact frame is shown.",
         46, -286,
-        function() return PPH.db.friendlyIdentity.keepPlayerName end,
-        function(value) PPH.db.friendlyIdentity.keepPlayerName = value end
+        function() return PGT.db.friendlyIdentity.keepPlayerName end,
+        function(value) PGT.db.friendlyIdentity.keepPlayerName = value end
     ))
     table.insert(self.fiChildren, keepPlayer)
 
@@ -401,15 +401,15 @@ function SettingsUI:BuildPanel()
         "Identity template",
         "Available tokens: {spec}, {class}, {party}. Example: {spec} {class} {party}",
         24, -366, 360,
-        function() return PPH.db.friendlyIdentity.format end,
+        function() return PGT.db.friendlyIdentity.format end,
         function(value)
-            local module = PPH.modules.FriendlyIdentity
+            local module = PGT.modules.FriendlyIdentity
             local normalized = module and module:NormalizeFormat(value) or nil
             if not normalized then
-                PPH:Print("Invalid identity format. Valid tokens: {spec}, {class}, {party}.")
+                PGT:Print("Invalid identity format. Valid tokens: {spec}, {class}, {party}.")
                 return false
             end
-            PPH.db.friendlyIdentity.format = normalized
+            PGT.db.friendlyIdentity.format = normalized
             return true
         end
     )))
@@ -421,8 +421,8 @@ function SettingsUI:BuildPanel()
     presetLabel:SetText("Quick presets")
 
     local function SetPreset(format)
-        PPH.db.friendlyIdentity.format = format
-        PPH:Refresh("settings-preset")
+        PGT.db.friendlyIdentity.format = format
+        PGT:Refresh("settings-preset")
         SettingsUI:RefreshControls()
     end
 
@@ -444,9 +444,9 @@ function SettingsUI:BuildPanel()
         "Party number prefix",
         "Prefix used by {party}. Use P for P1/P2; leave empty for 1/2.",
         24, -470, 150,
-        function() return PPH.db.friendlyIdentity.partyPrefix end,
+        function() return PGT.db.friendlyIdentity.partyPrefix end,
         function(value)
-            PPH.db.friendlyIdentity.partyPrefix = tostring(value or "")
+            PGT.db.friendlyIdentity.partyPrefix = tostring(value or "")
             return true
         end
     )))
@@ -457,13 +457,13 @@ function SettingsUI:BuildPanel()
         "Fallback text",
         "Used when specialization/class/party information is not available yet. The addon never intentionally falls back to the teammate's real name while masking is active.",
         220, -470, 180,
-        function() return PPH.db.friendlyIdentity.fallbackText end,
+        function() return PGT.db.friendlyIdentity.fallbackText end,
         function(value)
             value = tostring(value or ""):gsub("^%s+", ""):gsub("%s+$", "")
             if value == "" then
                 value = "Ally"
             end
-            PPH.db.friendlyIdentity.fallbackText = value
+            PGT.db.friendlyIdentity.fallbackText = value
             return true
         end
     )))
@@ -480,8 +480,8 @@ function SettingsUI:BuildPanel()
         "Enable current-target highlight",
         "Adds a strong border/glow around the compact party/raid frame representing your current target.",
         22, -608,
-        function() return PPH.db.partyTargetHighlight.enabled end,
-        function(value) PPH.db.partyTargetHighlight.enabled = value end
+        function() return PGT.db.partyTargetHighlight.enabled end,
+        function(value) PGT.db.partyTargetHighlight.enabled = value end
     ))
 
     self.highlightChildren = {}
@@ -491,8 +491,8 @@ function SettingsUI:BuildPanel()
         "Arena only",
         "When enabled, the target highlight is hidden outside arena instances.",
         46, -640,
-        function() return PPH.db.partyTargetHighlight.arenaOnly end,
-        function(value) PPH.db.partyTargetHighlight.arenaOnly = value end
+        function() return PGT.db.partyTargetHighlight.arenaOnly end,
+        function(value) PGT.db.partyTargetHighlight.arenaOnly = value end
     ))
     table.insert(self.highlightChildren, arenaOnly)
 
@@ -501,8 +501,8 @@ function SettingsUI:BuildPanel()
         "Show strong border",
         "Show the inner high-contrast border around the selected teammate frame.",
         46, -670,
-        function() return PPH.db.partyTargetHighlight.showBorder end,
-        function(value) PPH.db.partyTargetHighlight.showBorder = value end
+        function() return PGT.db.partyTargetHighlight.showBorder end,
+        function(value) PGT.db.partyTargetHighlight.showBorder = value end
     ))
     table.insert(self.highlightChildren, showBorder)
 
@@ -511,32 +511,32 @@ function SettingsUI:BuildPanel()
         "Show outer glow",
         "Show the outer glow ring around the selected teammate frame.",
         46, -700,
-        function() return PPH.db.partyTargetHighlight.showGlow end,
-        function(value) PPH.db.partyTargetHighlight.showGlow = value end
+        function() return PGT.db.partyTargetHighlight.showGlow end,
+        function(value) PGT.db.partyTargetHighlight.showGlow = value end
     ))
     table.insert(self.highlightChildren, showGlow)
 
     local partyColor = self:RegisterControl(CreateColorButton(
         content, "Highlight color", "Choose the Party / Raid Frame target highlight color.",
         46, -732,
-        function() return PPH.db.partyTargetHighlight.color end,
-        function(value) PPH.db.partyTargetHighlight.color = value end
+        function() return PGT.db.partyTargetHighlight.color end,
+        function(value) PGT.db.partyTargetHighlight.color = value end
     ))
     table.insert(self.highlightChildren, partyColor)
 
     local partyThickness = self:RegisterControl(CreateSlider(
         content, "Thickness", "Controls the border and glow width in pixels.",
         250, -730, 150, 1, 12, 1,
-        function() return PPH.db.partyTargetHighlight.thickness end,
-        function(value) PPH.db.partyTargetHighlight.thickness = value end
+        function() return PGT.db.partyTargetHighlight.thickness end,
+        function(value) PGT.db.partyTargetHighlight.thickness = value end
     ))
     table.insert(self.highlightChildren, partyThickness)
 
     local partyContrast = self:RegisterControl(CreateSlider(
         content, "Contrast", "Controls highlight opacity and visual contrast.",
         450, -730, 150, 0, 100, 5,
-        function() return PPH.db.partyTargetHighlight.contrast end,
-        function(value) PPH.db.partyTargetHighlight.contrast = value end
+        function() return PGT.db.partyTargetHighlight.contrast end,
+        function(value) PGT.db.partyTargetHighlight.contrast = value end
     ))
     table.insert(self.highlightChildren, partyContrast)
 
@@ -547,8 +547,8 @@ function SettingsUI:BuildPanel()
         "Enable current-target highlight on nameplates",
         "Highlights the current enemy or friendly target's nameplate with an independently configurable style, layered above nameplate skins such as BetterBlizzPlates.",
         22, -824,
-        function() return PPH.db.nameplateTargetHighlight.enabled end,
-        function(value) PPH.db.nameplateTargetHighlight.enabled = value end
+        function() return PGT.db.nameplateTargetHighlight.enabled end,
+        function(value) PGT.db.nameplateTargetHighlight.enabled = value end
     ))
 
     self.nameplateHighlightChildren = {}
@@ -556,40 +556,40 @@ function SettingsUI:BuildPanel()
     local nameplateBorder = self:RegisterControl(CreateCheckbox(
         content, "Show strong border", "Show the inner high-contrast nameplate border.",
         46, -856,
-        function() return PPH.db.nameplateTargetHighlight.showBorder end,
-        function(value) PPH.db.nameplateTargetHighlight.showBorder = value end
+        function() return PGT.db.nameplateTargetHighlight.showBorder end,
+        function(value) PGT.db.nameplateTargetHighlight.showBorder = value end
     ))
     table.insert(self.nameplateHighlightChildren, nameplateBorder)
 
     local nameplateGlow = self:RegisterControl(CreateCheckbox(
         content, "Show outer glow", "Show the outer nameplate glow.",
         46, -886,
-        function() return PPH.db.nameplateTargetHighlight.showGlow end,
-        function(value) PPH.db.nameplateTargetHighlight.showGlow = value end
+        function() return PGT.db.nameplateTargetHighlight.showGlow end,
+        function(value) PGT.db.nameplateTargetHighlight.showGlow = value end
     ))
     table.insert(self.nameplateHighlightChildren, nameplateGlow)
 
     local nameplateColor = self:RegisterControl(CreateColorButton(
         content, "Highlight color", "Choose the nameplate target highlight color independently.",
         46, -918,
-        function() return PPH.db.nameplateTargetHighlight.color end,
-        function(value) PPH.db.nameplateTargetHighlight.color = value end
+        function() return PGT.db.nameplateTargetHighlight.color end,
+        function(value) PGT.db.nameplateTargetHighlight.color = value end
     ))
     table.insert(self.nameplateHighlightChildren, nameplateColor)
 
     local nameplateThickness = self:RegisterControl(CreateSlider(
         content, "Thickness", "Controls the nameplate border and glow width in pixels.",
         250, -916, 150, 1, 12, 1,
-        function() return PPH.db.nameplateTargetHighlight.thickness end,
-        function(value) PPH.db.nameplateTargetHighlight.thickness = value end
+        function() return PGT.db.nameplateTargetHighlight.thickness end,
+        function(value) PGT.db.nameplateTargetHighlight.thickness = value end
     ))
     table.insert(self.nameplateHighlightChildren, nameplateThickness)
 
     local nameplateContrast = self:RegisterControl(CreateSlider(
         content, "Contrast", "Controls nameplate highlight opacity and visual contrast.",
         450, -916, 150, 0, 100, 5,
-        function() return PPH.db.nameplateTargetHighlight.contrast end,
-        function(value) PPH.db.nameplateTargetHighlight.contrast = value end
+        function() return PGT.db.nameplateTargetHighlight.contrast end,
+        function(value) PGT.db.nameplateTargetHighlight.contrast = value end
     ))
     table.insert(self.nameplateHighlightChildren, nameplateContrast)
 
@@ -598,26 +598,26 @@ function SettingsUI:BuildPanel()
     self.debugControl = self:RegisterControl(CreateCheckbox(
         content,
         "Debug messages",
-        "Print additional PPH state information to chat for troubleshooting.",
+        "Print additional PGT state information to chat for troubleshooting.",
         22, -1010,
-        function() return PPH.db.debug end,
-        function(value) PPH.db.debug = value end
+        function() return PGT.db.debug end,
+        function(value) PGT.db.debug = value end
     ))
 
     self.statusText = content:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     self.statusText:SetPoint("TOPLEFT", content, "TOPLEFT", 270, -1016)
 
     CreateButton(content, "Reset defaults", 22, -1052, 120, function()
-        PPH:ResetToDefaults()
+        PGT:ResetToDefaults()
         SettingsUI:RefreshControls()
-        PPH:Print("Settings reset to defaults.")
+        PGT:Print("Settings reset to defaults.")
     end)
 
     CreateButton(content, "Print status", 150, -1052, 110, function()
-        if PPH.PrintStatus then
-            PPH:PrintStatus()
+        if PGT.PrintStatus then
+            PGT:PrintStatus()
         else
-            PPH:Print("v" .. PPH.version .. " | arena=" .. tostring(PPH.inArena))
+            PGT:Print("v" .. PGT.version .. " | arena=" .. tostring(PGT.inArena))
         end
     end)
 
@@ -626,12 +626,12 @@ function SettingsUI:BuildPanel()
     end
 
     panel.OnDefault = function()
-        PPH:ResetToDefaults()
+        PGT:ResetToDefaults()
         SettingsUI:RefreshControls()
     end
 
     panel.OnCommit = function()
-        PPH:Refresh("settings-commit")
+        PGT:Refresh("settings-commit")
     end
 
     panel:SetScript("OnShow", function()
@@ -647,7 +647,7 @@ function SettingsUI:RegisterSettingsCategory()
     end
 
     local panel = self:BuildPanel()
-    local category, layout = Settings.RegisterCanvasLayoutCategory(panel, PPH.name)
+    local category, layout = Settings.RegisterCanvasLayoutCategory(panel, PGT.name)
     if layout and layout.AddAnchorPoint then
         layout:AddAnchorPoint("TOPLEFT", 0, 0)
         layout:AddAnchorPoint("BOTTOMRIGHT", 0, 0)
@@ -656,7 +656,7 @@ function SettingsUI:RegisterSettingsCategory()
 
     self.category = category
     self.categoryID = category:GetID()
-    PPH.settingsCategoryID = self.categoryID
+    PGT.settingsCategoryID = self.categoryID
 end
 
 function SettingsUI:Open()
@@ -675,8 +675,8 @@ end
 
 function SettingsUI:OnInitialize()
     self:RegisterSettingsCategory()
-    PPH:RegisterCallback("PPH_CONFIG_CHANGED", self, "OnConfigChanged")
-    PPH:RegisterCallback("PPH_SETTINGS_REFRESH", self, "OnConfigChanged")
+    PGT:RegisterCallback("PGT_CONFIG_CHANGED", self, "OnConfigChanged")
+    PGT:RegisterCallback("PGT_SETTINGS_REFRESH", self, "OnConfigChanged")
 end
 
-PPH:RegisterModule("SettingsUI", SettingsUI)
+PGT:RegisterModule("SettingsUI", SettingsUI)

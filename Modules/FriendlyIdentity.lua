@@ -1,4 +1,4 @@
-local _, PPH = ...
+local _, PGT = ...
 
 local FriendlyIdentity = {
     seenPartyFrames = setmetatable({}, { __mode = "k" }),
@@ -18,16 +18,16 @@ local function Trim(text)
 end
 
 function FriendlyIdentity:GetSettings()
-    return PPH.db and PPH.db.friendlyIdentity
+    return PGT.db and PGT.db.friendlyIdentity
 end
 
 function FriendlyIdentity:IsEnabled()
     local db = self:GetSettings()
-    return PPH.db
-        and PPH.db.enabled
+    return PGT.db
+        and PGT.db.enabled
         and db
         and db.enabled
-        and PPH.inArena
+        and PGT.inArena
 end
 
 function FriendlyIdentity:NormalizeFormat(value)
@@ -86,7 +86,7 @@ function FriendlyIdentity:GetFrameUnit(frame)
     end
 
     local unit = frame.displayedUnit or frame.unit
-    if PPH:IsSecret(unit) or type(unit) ~= "string" then
+    if PGT:IsSecret(unit) or type(unit) ~= "string" then
         return nil
     end
     return unit
@@ -105,10 +105,10 @@ function FriendlyIdentity:GetPartyNumber(unit)
         end
     end
 
-    local unitGUID = PPH:GetSafeUnitGUID(unit)
+    local unitGUID = PGT:GetSafeUnitGUID(unit)
     if unitGUID then
         for index = 1, 4 do
-            local partyGUID = PPH:GetSafeUnitGUID("party" .. index)
+            local partyGUID = PGT:GetSafeUnitGUID("party" .. index)
             if partyGUID and partyGUID == unitGUID then
                 return index
             end
@@ -116,7 +116,7 @@ function FriendlyIdentity:GetPartyNumber(unit)
     end
 
     for index = 1, 4 do
-        local sameUnit = PPH:GetSafeBoolean(UnitIsUnit, unit, "party" .. index)
+        local sameUnit = PGT:GetSafeBoolean(UnitIsUnit, unit, "party" .. index)
         if sameUnit == true then
             return index
         end
@@ -126,16 +126,16 @@ function FriendlyIdentity:GetPartyNumber(unit)
 end
 
 function FriendlyIdentity:GetUnitIdentity(unit)
-    local specID = PPH.Inspect and PPH.Inspect:GetSpecID(unit) or nil
-    local specData = specID and PPH.SpecData[specID] or nil
+    local specID = PGT.Inspect and PGT.Inspect:GetSpecID(unit) or nil
+    local specData = specID and PGT.SpecData[specID] or nil
 
     local specText = specData and specData.spec or nil
     local classText = specData and specData.class or nil
 
-    if not classText and PPH.Inspect then
-        local classFile = PPH.Inspect:GetClassFile(unit)
+    if not classText and PGT.Inspect then
+        local classFile = PGT.Inspect:GetClassFile(unit)
         if classFile then
-            classText = PPH.ClassAbbreviations[classFile]
+            classText = PGT.ClassAbbreviations[classFile]
         end
     end
 
@@ -174,13 +174,13 @@ function FriendlyIdentity:ShouldMaskUnit(unit)
     end
 
     local db = self:GetSettings()
-    if db.keepPlayerName and PPH:IsPlayerUnit(unit) then
+    if db.keepPlayerName and PGT:IsPlayerUnit(unit) then
         return false
     end
 
-    local exists = PPH:GetSafeBoolean(UnitExists, unit)
-    local isPlayer = PPH:GetSafeBoolean(UnitIsPlayer, unit)
-    local isFriend = PPH:GetSafeBoolean(UnitIsFriend, "player", unit)
+    local exists = PGT:GetSafeBoolean(UnitExists, unit)
+    local isPlayer = PGT:GetSafeBoolean(UnitIsPlayer, unit)
+    local isFriend = PGT:GetSafeBoolean(UnitIsFriend, "player", unit)
 
     return exists == true and isPlayer == true and isFriend == true
 end
@@ -223,8 +223,8 @@ function FriendlyIdentity:ApplyPartyFrame(frame)
     if self:ShouldMaskUnit(unit) and frame.name then
         frame.name:SetText(self:FormatUnit(unit))
         frame.name:Show()
-        if PPH.Inspect then
-            PPH.Inspect:QueueUnit(unit)
+        if PGT.Inspect then
+            PGT.Inspect:QueueUnit(unit)
         end
     end
 end
@@ -240,7 +240,7 @@ function FriendlyIdentity:RestorePartyFrame(frame)
     end
 
     local ok, name = pcall(GetUnitName, unit, true)
-    if ok and not PPH:IsSecret(name) and name then
+    if ok and not PGT:IsSecret(name) and name then
         frame.name:SetText(name)
     end
 end
@@ -277,8 +277,8 @@ function FriendlyIdentity:ApplyTargetFrame()
 
     if self:ShouldMaskUnit("target") then
         nameFontString:SetText(self:FormatUnit("target"))
-        if PPH.Inspect then
-            PPH.Inspect:QueueUnit("target", true)
+        if PGT.Inspect then
+            PGT.Inspect:QueueUnit("target", true)
         end
     else
         self:RestoreTargetFrame()
@@ -291,13 +291,13 @@ function FriendlyIdentity:RestoreTargetFrame()
         return
     end
 
-    local exists = PPH:GetSafeBoolean(UnitExists, "target")
+    local exists = PGT:GetSafeBoolean(UnitExists, "target")
     if exists ~= true then
         return
     end
 
     local ok, name = pcall(UnitName, "target")
-    if ok and not PPH:IsSecret(name) and name then
+    if ok and not PGT:IsSecret(name) and name then
         nameFontString:SetText(name)
     end
 end
@@ -388,12 +388,12 @@ end
 
 function FriendlyIdentity:OnInitialize()
     self:InstallHooks()
-    PPH:RegisterCallback("PLAYER_LOGIN", self, "OnArenaStateChanged")
-    PPH:RegisterCallback("PLAYER_TARGET_CHANGED", self, "OnTargetChanged")
-    PPH:RegisterCallback("GROUP_ROSTER_UPDATE", self, "OnArenaStateChanged")
-    PPH:RegisterCallback("PPH_ARENA_STATE_CHANGED", self, "OnArenaStateChanged")
-    PPH:RegisterCallback("PPH_INSPECT_UPDATED", self, "OnInspectUpdated")
-    PPH:RegisterCallback("PPH_CONFIG_CHANGED", self, "OnConfigChanged")
+    PGT:RegisterCallback("PLAYER_LOGIN", self, "OnArenaStateChanged")
+    PGT:RegisterCallback("PLAYER_TARGET_CHANGED", self, "OnTargetChanged")
+    PGT:RegisterCallback("GROUP_ROSTER_UPDATE", self, "OnArenaStateChanged")
+    PGT:RegisterCallback("PGT_ARENA_STATE_CHANGED", self, "OnArenaStateChanged")
+    PGT:RegisterCallback("PGT_INSPECT_UPDATED", self, "OnInspectUpdated")
+    PGT:RegisterCallback("PGT_CONFIG_CHANGED", self, "OnConfigChanged")
 end
 
-PPH:RegisterModule("FriendlyIdentity", FriendlyIdentity)
+PGT:RegisterModule("FriendlyIdentity", FriendlyIdentity)

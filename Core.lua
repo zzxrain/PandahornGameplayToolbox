@@ -1,14 +1,14 @@
-local ADDON_NAME, PPH = ...
+local ADDON_NAME, PGT = ...
 
-_G.PandahornPVPHelper = PPH
+_G.PandahornGameplayToolbox = PGT
 
-PPH.name = "Pandahorn PVP Helper"
-PPH.version = "0.4.0"
-PPH.modules = PPH.modules or {}
-PPH.moduleOrder = PPH.moduleOrder or {}
-PPH.callbacks = PPH.callbacks or {}
-PPH.initialized = false
-PPH.inArena = false
+PGT.name = "Pandahorn Gameplay Toolbox"
+PGT.version = "0.4.0"
+PGT.modules = PGT.modules or {}
+PGT.moduleOrder = PGT.moduleOrder or {}
+PGT.callbacks = PGT.callbacks or {}
+PGT.initialized = false
+PGT.inArena = false
 
 local DEFAULTS = {
     dbVersion = 4,
@@ -56,10 +56,10 @@ local DEFAULTS = {
     },
 }
 
-PPH.DEFAULTS = DEFAULTS
+PGT.DEFAULTS = DEFAULTS
 
 local eventFrame = CreateFrame("Frame")
-PPH.eventFrame = eventFrame
+PGT.eventFrame = eventFrame
 
 local function DeepCopy(value)
     if type(value) ~= "table" then
@@ -89,24 +89,24 @@ local function CopyDefaults(defaults, target)
     return target
 end
 
-function PPH:Print(message)
-    DEFAULT_CHAT_FRAME:AddMessage("|cff66ccffPPH|r: " .. tostring(message))
+function PGT:Print(message)
+    DEFAULT_CHAT_FRAME:AddMessage("|cff66ccffPGT|r: " .. tostring(message))
 end
 
-function PPH:Debug(message)
+function PGT:Debug(message)
     if self.db and self.db.debug then
         self:Print("|cff999999[debug]|r " .. tostring(message))
     end
 end
 
-function PPH:IsSecret(value)
+function PGT:IsSecret(value)
     if _G.issecretvalue then
         return _G.issecretvalue(value)
     end
     return false
 end
 
-function PPH:GetSafeBoolean(func, ...)
+function PGT:GetSafeBoolean(func, ...)
     local ok, value = pcall(func, ...)
     if not ok or self:IsSecret(value) then
         return nil
@@ -114,7 +114,7 @@ function PPH:GetSafeBoolean(func, ...)
     return value and true or false
 end
 
-function PPH:GetSafeUnitGUID(unit)
+function PGT:GetSafeUnitGUID(unit)
     local ok, guid = pcall(UnitGUID, unit)
     if not ok or self:IsSecret(guid) then
         return nil
@@ -122,7 +122,7 @@ function PPH:GetSafeUnitGUID(unit)
     return guid
 end
 
-function PPH:GetSafeClassFile(unit)
+function PGT:GetSafeClassFile(unit)
     local ok, _, classFile = pcall(UnitClass, unit)
     if not ok or self:IsSecret(classFile) then
         return nil
@@ -130,7 +130,7 @@ function PPH:GetSafeClassFile(unit)
     return classFile
 end
 
-function PPH:IsPlayerUnit(unit)
+function PGT:IsPlayerUnit(unit)
     if unit == "player" then
         return true
     end
@@ -145,7 +145,7 @@ function PPH:IsPlayerUnit(unit)
     return result == true
 end
 
-function PPH:IsArenaInstance()
+function PGT:IsArenaInstance()
     local ok, inInstance, instanceType = pcall(IsInInstance)
     if ok and not self:IsSecret(inInstance) and not self:IsSecret(instanceType) then
         if inInstance and instanceType == "arena" then
@@ -170,7 +170,7 @@ function PPH:IsArenaInstance()
     return false
 end
 
-function PPH:RegisterModule(name, module)
+function PGT:RegisterModule(name, module)
     if not name or not module then
         return
     end
@@ -184,10 +184,10 @@ function PPH:RegisterModule(name, module)
     self.modules[name] = module
 end
 
-function PPH:RegisterCallback(event, owner, method)
+function PGT:RegisterCallback(event, owner, method)
     if not self.callbacks[event] then
         self.callbacks[event] = {}
-        if event:sub(1, 4) ~= "PPH_" then
+        if event:sub(1, 4) ~= "PGT_" then
             eventFrame:RegisterEvent(event)
         end
     end
@@ -198,7 +198,7 @@ function PPH:RegisterCallback(event, owner, method)
     })
 end
 
-function PPH:Fire(event, ...)
+function PGT:Fire(event, ...)
     local callbacks = self.callbacks[event]
     if not callbacks then
         return
@@ -215,35 +215,35 @@ function PPH:Fire(event, ...)
     end
 end
 
-function PPH:UpdateArenaState()
+function PGT:UpdateArenaState()
     local newState = self:IsArenaInstance()
     if newState ~= self.inArena then
         self.inArena = newState
         self:Debug("Arena state changed: " .. tostring(newState))
-        self:Fire("PPH_ARENA_STATE_CHANGED", newState)
+        self:Fire("PGT_ARENA_STATE_CHANGED", newState)
     end
 end
 
-function PPH:Refresh(reason)
+function PGT:Refresh(reason)
     self:UpdateArenaState()
-    self:Fire("PPH_CONFIG_CHANGED", reason)
+    self:Fire("PGT_CONFIG_CHANGED", reason)
 end
 
-function PPH:ResetToDefaults()
-    PandahornPVPHelperDB = DeepCopy(DEFAULTS)
-    self.db = PandahornPVPHelperDB
+function PGT:ResetToDefaults()
+    PandahornGameplayToolboxDB = DeepCopy(DEFAULTS)
+    self.db = PandahornGameplayToolboxDB
     self:Refresh("reset")
-    self:Fire("PPH_SETTINGS_REFRESH")
+    self:Fire("PGT_SETTINGS_REFRESH")
 end
 
-function PPH:Initialize()
+function PGT:Initialize()
     if self.initialized then
         return
     end
 
-    PandahornPVPHelperDB = CopyDefaults(DEFAULTS, PandahornPVPHelperDB or {})
-    PandahornPVPHelperDB.dbVersion = DEFAULTS.dbVersion
-    self.db = PandahornPVPHelperDB
+    PandahornGameplayToolboxDB = CopyDefaults(DEFAULTS, PandahornGameplayToolboxDB or {})
+    PandahornGameplayToolboxDB.dbVersion = DEFAULTS.dbVersion
+    self.db = PandahornGameplayToolboxDB
 
     for _, moduleName in ipairs(self.moduleOrder) do
         local module = self.modules[moduleName]
@@ -254,7 +254,7 @@ function PPH:Initialize()
 
     self.initialized = true
     self:UpdateArenaState()
-    self:Fire("PPH_READY")
+    self:Fire("PGT_READY")
 end
 
 eventFrame:RegisterEvent("ADDON_LOADED")
@@ -267,21 +267,21 @@ eventFrame:SetScript("OnEvent", function(_, event, ...)
     if event == "ADDON_LOADED" then
         local addonName = ...
         if addonName == ADDON_NAME then
-            PPH:Initialize()
+            PGT:Initialize()
         end
         return
     end
 
-    if PPH.initialized then
+    if PGT.initialized then
         if event == "PLAYER_ENTERING_WORLD"
             or event == "ZONE_CHANGED_NEW_AREA"
             or event == "PVP_MATCH_ACTIVE"
             or event == "PVP_MATCH_INACTIVE" then
             C_Timer.After(0, function()
-                PPH:UpdateArenaState()
+                PGT:UpdateArenaState()
             end)
         end
 
-        PPH:Fire(event, ...)
+        PGT:Fire(event, ...)
     end
 end)

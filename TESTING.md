@@ -1,13 +1,13 @@
-# Pandahorn PVP Helper 0.4.0 - In-game Test Checklist
+# Pandahorn Gameplay Toolbox 0.4.0 - In-game Test Checklist
 
 Because the addon cannot be executed against a real WoW client in this build environment, use this checklist for the first arena session.
 
 ## A. Settings registration
 
-1. Log in with PPH enabled.
-2. Open `Esc -> Options -> AddOns -> Pandahorn PVP Helper`.
+1. Log in with PGT enabled.
+2. Open `Esc -> Options -> AddOns -> Pandahorn Gameplay Toolbox`.
 3. Confirm all sections render without Lua errors.
-4. Run `/pph settings` and confirm it opens the same category.
+4. Run `/pgt settings` and confirm it opens the same category.
 
 ## B. Friendly Identity - outside arena
 
@@ -46,7 +46,7 @@ Because the addon cannot be executed against a real WoW client in this build env
 
 ## F. Nameplate Target Highlight
 
-1. Enable enemy and friendly nameplates, then enable `Nameplate Target Highlight` in PPH Settings.
+1. Enable enemy and friendly nameplates, then enable `Nameplate Target Highlight` in PGT Settings.
 2. Target an enemy with a visible nameplate and confirm its health bar gets the same strong border and outer glow as Party Target Highlight.
 3. Target a friendly unit with a visible nameplate and confirm the same effect appears.
 4. Switch rapidly between visible targets and confirm the old highlight is removed and only the current target remains highlighted.
@@ -58,13 +58,13 @@ Because the addon cannot be executed against a real WoW client in this build env
 
 ## G. Compatibility / diagnostics
 
-1. If the standalone `SimplePartyHighlight` addon is installed, disable it before testing PPH 0.3.0 to avoid duplicate visuals.
+1. If the standalone `SimplePartyHighlight` addon is installed, disable it before testing PGT 0.3.0 to avoid duplicate visuals.
 2. Test with BetterBlizzFrames enabled if that is part of your UI stack.
-3. Test with BetterBlizzPlates enabled, including with its own target indicator enabled, and confirm the PPH border/glow stays visible above the nameplate skin.
-4. Resize nameplates through BetterBlizzPlates and confirm the PPH highlight remains anchored to the health bar.
+3. Test with BetterBlizzPlates enabled, including with its own target indicator enabled, and confirm the PGT border/glow stays visible above the nameplate skin.
+4. Resize nameplates through BetterBlizzPlates and confirm the PGT highlight remains anchored to the health bar.
 5. Keep BugSack + BugGrabber enabled for the first few matches.
 6. If an error occurs, capture the full Lua stack plus the action that triggered it.
-7. `/pph debug on` can be used for additional state messages.
+7. `/pgt debug on` can be used for additional state messages.
 
 ## 0.2.1 Regression
 

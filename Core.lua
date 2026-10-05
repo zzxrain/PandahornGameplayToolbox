@@ -3,7 +3,7 @@ local ADDON_NAME, PGT = ...
 _G.PandahornGameplayToolbox = PGT
 
 PGT.name = "Pandahorn Gameplay Toolbox"
-PGT.version = "0.4.0"
+PGT.version = "0.5.1"
 PGT.modules = PGT.modules or {}
 PGT.moduleOrder = PGT.moduleOrder or {}
 PGT.callbacks = PGT.callbacks or {}

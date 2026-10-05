@@ -1,4 +1,4 @@
-# Pandahorn Gameplay Toolbox 0.4.0 - In-game Test Checklist
+# Pandahorn Gameplay Toolbox 0.5.1 - In-game Test Checklist
 
 Because the addon cannot be executed against a real WoW client in this build environment, use this checklist for the first arena session.
 

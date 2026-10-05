@@ -39,10 +39,6 @@ Open:
 
 `Esc -> Options -> AddOns -> Pandahorn Gameplay Toolbox`
 
-or:
-
-`/pgt settings`
-
 Settings are applied immediately.
 
 Available sections:
@@ -74,27 +70,6 @@ If you previously installed the standalone `SimplePartyHighlight`, disable or re
 
 `{party}` maps to the WoW `party1` / `party2` / ... unit token number. If another addon visually re-sorts party frames, the token number may not equal the visible top-to-bottom position.
 
-## Commands
-
-- `/pgt settings`
-- `/pgt status`
-- `/pgt on` / `/pgt off`
-- `/pgt party on` / `/pgt party off`
-- `/pgt target on` / `/pgt target off`
-- `/pgt format spec class`
-- `/pgt format spec class party`
-- `/pgt format {spec} {class} {party}`
-- `/pgt partyprefix P`
-- `/pgt partyprefix none`
-- `/pgt fallback Ally`
-- `/pgt highlight on` / `/pgt highlight off`
-- `/pgt highlight arena on` / `/pgt highlight arena off`
-- `/pgt highlight border on` / `/pgt highlight border off`
-- `/pgt highlight glow on` / `/pgt highlight glow off`
-- `/pgt preview`
-- `/pgt debug on` / `/pgt debug off`
-- `/pgt reset`
-
 ## Architecture
 
 - `Core.lua` - lifecycle, ordered module initialization, SavedVariables, arena detection, callback bus and secret-value helpers.
@@ -104,6 +79,5 @@ If you previously installed the standalone `SimplePartyHighlight`, disable or re
 - `Modules/PartyTargetHighlight.lua` - current-target party frame border/glow module.
 - `Modules/NameplateTargetHighlight.lua` - event-driven enemy/friendly current-target nameplate border/glow module.
 - `UI/Settings.lua` - Blizzard Settings -> AddOns configuration page.
-- `Commands.lua` - slash-command configuration and diagnostics.
 
 Future functionality should be implemented as independent modules under `Modules/` and registered through `PGT:RegisterModule()`.

@@ -15,6 +15,20 @@ files=("$name.toc")
 while IFS= read -r line || [[ -n "$line" ]]; do
     entry=$(printf '%s' "$line" | tr '\\' '/' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
     case "$entry" in
+        '## IconTexture:'*)
+            entry=${entry#'## IconTexture:'}
+            entry=$(printf '%s' "$entry" | sed 's/^[[:space:]]*//')
+            prefix="Interface/AddOns/$name/"
+            [[ "$entry" == "$prefix"* ]] || fail "IconTexture must be inside the addon directory"
+            entry=${entry#"$prefix"}
+            ;;
+        '# Package:'*)
+            entry=${entry#'# Package:'}
+            entry=$(printf '%s' "$entry" | sed 's/^[[:space:]]*//')
+            [[ -n "$entry" ]] || fail "Empty Package resource path"
+            ;;
+    esac
+    case "$entry" in
         ''|\#*) continue ;;
         /*|*:*|..|../*|*/../*|*/..) fail "Invalid manifest path: $entry" ;;
     esac

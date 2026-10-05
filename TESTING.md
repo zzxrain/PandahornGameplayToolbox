@@ -7,6 +7,11 @@ Because the addon cannot be executed against a real WoW client in this build env
 1. Log in with PGT enabled.
 2. Open `Esc -> Options -> AddOns -> Pandahorn Gameplay Toolbox`.
 3. Confirm all sections render without Lua errors.
+4. Confirm the addon list shows the supplied addon icon.
+5. Open each feature's Preview button: Friendly Identity shows the arena rename image,
+   Party Target Highlight shows the party/raid highlight image, and Nameplate Target
+   Highlight shows both examples. Check proportions, close the preview, reopen it,
+   and switch between features without leftover images. Closing Settings should hide the preview.
 
 ## B. Friendly Identity - outside arena
 

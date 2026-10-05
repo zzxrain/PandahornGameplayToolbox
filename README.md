@@ -41,6 +41,10 @@ Open:
 
 Settings are applied immediately.
 
+Use the **Preview** buttons beside Friendly Identity, Party Target Highlight,
+and Nameplate Target Highlight to view example screenshots. The nameplate preview
+shows both supplied examples. These are static examples, not live previews of your settings.
+
 Available sections:
 
 - General
@@ -70,10 +74,16 @@ bash scripts/package.sh
 The script reads the version and runtime file list from `PandahornGameplayToolbox.toc`
 and creates `dist/PandahornGameplayToolbox-<version>.zip`. It also works when invoked
 from another working directory. The ZIP contains a single `PandahornGameplayToolbox/`
-folder with only the manifest and its listed files; documentation, Git metadata,
+folder with only the manifest, its listed files, the `IconTexture`, and resources
+declared using `# Package: <relative path>` comments in the manifest; documentation, Git metadata,
 scripts, and development outputs are excluded. Missing or unsafe manifest paths
 stop packaging before replacing an existing ZIP. Extract the ZIP into
 `World of Warcraft/_retail_/Interface/AddOns/` to install.
+
+`Media/addon_icon.tga` supplies the in-game addon-list icon. Game-ready preview
+textures live under `Media/Previews/`; their original PNGs are kept under
+`assets/previews/` and excluded from the ZIP. The TGA previews preserve the original
+pixels on transparent power-of-two canvases; the UI crops the padding when displaying them.
 
 ## Name format examples
 

@@ -8,6 +8,70 @@ local SettingsUI = {
 
 PGT.SettingsUI = SettingsUI
 
+local PREVIEWS = {
+    friendly = {
+        { file = "Arena_Party_Frame_Rename", width = 434, height = 570, textureWidth = 512, textureHeight = 1024 },
+    },
+    party = {
+        { file = "Party_Raid_Frame_Highlight", width = 446, height = 346, textureWidth = 512, textureHeight = 512 },
+    },
+    nameplate = {
+        { file = "Target_HighLight_1", width = 582, height = 738, textureWidth = 1024, textureHeight = 1024 },
+        { file = "Target_HighLight_2", width = 946, height = 478, textureWidth = 1024, textureHeight = 512 },
+    },
+}
+
+function SettingsUI:ShowPreview(title, images)
+    if not self.previewFrame then
+        local frame = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+        frame:SetFrameStrata("DIALOG")
+        frame:SetPoint("CENTER")
+        frame:EnableMouse(true)
+        frame:SetBackdrop({
+            bgFile = "Interface\\Buttons\\WHITE8X8",
+            edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+            tile = true, tileSize = 16, edgeSize = 16,
+            insets = { left = 4, right = 4, top = 4, bottom = 4 },
+        })
+        frame:SetBackdropColor(0.04, 0.04, 0.04, 1)
+        frame.title = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+        frame.title:SetPoint("TOPLEFT", 16, -16)
+        local close = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
+        close:SetPoint("TOPRIGHT", -4, -4)
+        close:SetScript("OnClick", function() frame:Hide() end)
+        frame.images = {}
+        self.previewFrame = frame
+    end
+
+    local frame = self.previewFrame
+    frame.title:SetText(title)
+    local width = math.min(660, UIParent:GetWidth() - 40)
+    local columnWidth = (width - 40) / #images
+    local maxHeight = math.min(420, UIParent:GetHeight() - 120)
+    local height = 0
+    for _, texture in ipairs(frame.images) do
+        texture:Hide()
+    end
+    for index, image in ipairs(images) do
+        local texture = frame.images[index]
+        if not texture then
+            texture = frame:CreateTexture(nil, "ARTWORK")
+            frame.images[index] = texture
+        end
+        local scale = math.min(columnWidth / image.width, maxHeight / image.height, 1)
+        local imageWidth, imageHeight = image.width * scale, image.height * scale
+        texture:ClearAllPoints()
+        texture:SetPoint("TOPLEFT", 20 + (index - 1) * columnWidth + (columnWidth - imageWidth) / 2, -48)
+        texture:SetSize(imageWidth, imageHeight)
+        texture:SetTexture("Interface\\AddOns\\PandahornGameplayToolbox\\Media\\Previews\\" .. image.file .. ".tga")
+        texture:SetTexCoord(0, image.width / image.textureWidth, 0, image.height / image.textureHeight)
+        texture:Show()
+        height = math.max(height, imageHeight)
+    end
+    frame:SetSize(width, height + 68)
+    frame:Show()
+end
+
 local function AddTooltip(frame, text)
     if not text or text == "" then
         return
@@ -351,6 +415,9 @@ function SettingsUI:BuildPanel()
     ))
 
     CreateSection(content, "Friendly Identity", 18, -160)
+    CreateButton(content, "Preview", 540, -152, 110, function()
+        SettingsUI:ShowPreview("Arena teammate names", PREVIEWS.friendly)
+    end)
 
     self.fiEnabled = self:RegisterControl(CreateCheckbox(
         content,
@@ -473,6 +540,9 @@ function SettingsUI:BuildPanel()
     self.previewText:SetText("Preview: |cffffffffHoly Pal|r")
 
     CreateSection(content, "Party Target Highlight", 18, -574)
+    CreateButton(content, "Preview", 540, -566, 110, function()
+        SettingsUI:ShowPreview("Party / Raid Frame highlight", PREVIEWS.party)
+    end)
 
     self.highlightEnabled = self:RegisterControl(CreateCheckbox(
         content,
@@ -540,6 +610,9 @@ function SettingsUI:BuildPanel()
     table.insert(self.highlightChildren, partyContrast)
 
     CreateSection(content, "Nameplate Target Highlight", 18, -790)
+    CreateButton(content, "Preview", 540, -782, 110, function()
+        SettingsUI:ShowPreview("Nameplate target highlight", PREVIEWS.nameplate)
+    end)
 
     self.nameplateHighlightEnabled = self:RegisterControl(CreateCheckbox(
         content,
@@ -631,6 +704,12 @@ function SettingsUI:BuildPanel()
 
     panel:SetScript("OnShow", function()
         SettingsUI:RefreshControls()
+    end)
+
+    panel:SetScript("OnHide", function()
+        if SettingsUI.previewFrame then
+            SettingsUI.previewFrame:Hide()
+        end
     end)
 
     return panel

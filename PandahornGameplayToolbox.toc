@@ -4,7 +4,7 @@
 ## Author: Pandahorn
 ## Version: 0.5.1
 ## SavedVariables: PandahornGameplayToolboxDB
-## IconTexture: Interface\AddOns\PandahornGameplayToolbox\Media\addon_icon.tga
+## IconTexture: Interface\AddOns\PandahornGameplayToolbox\Media\addon_icon_128.tga
 ## X-Category: PvP
 ## X-License: MIT
 

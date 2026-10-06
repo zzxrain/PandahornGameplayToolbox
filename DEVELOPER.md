@@ -20,14 +20,15 @@ On macOS, use the built-in Bash and `zip` tools; no Python is required. From the
 The script also works from other working directories. It reads the version and Lua file list from the `.toc`
 and includes the addon-local icon referenced by `## IconTexture:`.
 Output: `dist/PandahornGameplayToolbox-<version>.zip`, with `PandahornGameplayToolbox/` as the top-level folder.
-The current package contains only the manifest, seven Lua files, and `Media/addon_icon.tga`: nine files total.
+The current package contains only the manifest, seven Lua files, and `Media/addon_icon_128.tga`: nine files total.
 
 The script validates files and paths, rejects symlinks, and replaces the previous ZIP only after packaging succeeds.
 Documentation, source screenshots, Git metadata, scripts, and development outputs are excluded.
 
 ## Image resources
 
-- `Media/addon_icon.tga`: in-game addon-list icon, referenced by the manifest's `IconTexture` field.
+- `Media/addon_icon_128.tga`: in-game addon-list icon, referenced by the manifest's `IconTexture` field.
+- `Media/pandahorn_icon.gif`: archived source artwork only; not referenced by the manifest and excluded from release packages.
 - `assets/previews/*.png`: original screenshots for the README only. HTML width attributes reduce their displayed size without modifying the source images.
 
 ## Architecture

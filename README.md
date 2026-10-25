@@ -1,18 +1,26 @@
 # Pandahorn PVP Helper
 
-A lightweight, modular World of Warcraft Retail PvP helper designed for Midnight / Patch 12.1.
+A lightweight, modular helper for World of Warcraft Retail (Midnight) and WoW: Forever.
 
-## Version 0.3.0
+## Version 0.5.1
+
+### Supported clients
+
+- Retail / Midnight (`standard`, Interface `120100` / `120105`)
+- WoW: Forever 1.60.x (`camelot`, Interface `16001`)
+
+Forever uses a Mainline-derived UI/API, but its interface number and game type are different. PPH detects Forever from its `16000` interface range and avoids assuming that every Retail gameplay system is available.
 
 ### 1. Friendly Identity
 
-Arena-only identity masking for friendly players.
+Identity masking for friendly players. It is enabled by default and arena-only on Retail. On Forever it defaults to disabled because arenas are not currently available; users may explicitly enable it for ordinary groups.
 
 - Party / raid-style party frames: replace teammate names while keeping your own name by default.
 - Friendly Target Frame: replace the friendly player's real name with the same identity format.
 - Default format: `{spec} {class}` -> `Holy Pal`.
 - Configurable tokens: `{spec}`, `{class}`, `{party}`.
-- Specialization lookup is cached by GUID and populated through the inspect API.
+- On Retail, specialization lookup is cached by GUID and populated through the inspect API.
+- On Forever, the addon uses class and party-number fallbacks instead of interpreting Forever progression data as Retail specialization IDs.
 - If specialization data is not ready, the addon falls back to class / party number / `Ally`; it does not intentionally reveal the teammate's real name while masking is active.
 
 ### 2. Party Target Highlight
@@ -21,14 +29,15 @@ Integrated from the standalone `SimplePartyHighlight` prototype as a separate PP
 
 - Highlights the Blizzard compact party/raid frame that represents your current target.
 - Uses Blizzard's existing `frame.selectionHighlight:IsShown()` state rather than directly re-evaluating target identity with `UnitIsUnit()`.
-- Strong border + outer glow visual style.
-- Default: enabled and **arena-only**.
+- Strong border + outer glow visual style with configurable color, thickness, and contrast.
+- Default on Retail: enabled and **arena-only**.
+- On Forever, the unavailable arena restriction is ignored and the setting is disabled in the UI.
 - Settings allow border/glow to be enabled independently.
 
 ### 3. Nameplate Target Highlight
 
 - Highlights the nameplate belonging to the current target, for both enemies and friendlies.
-- Uses the same strong border and outer glow style settings as Party Target Highlight.
+- Has its own independently configurable border/glow, color, thickness, and contrast settings.
 - Runs independently from Party Target Highlight and has its own Settings UI toggle.
 - Uses event-driven target/nameplate updates instead of an `OnUpdate` scan.
 - The independent high-level overlay is designed to remain prominent with nameplate skins such as BetterBlizzPlates.
@@ -56,11 +65,24 @@ Available sections:
 
 ## Installation
 
-Copy the `PandahornPVPHelper` folder to:
+Copy the `PandahornPVPHelper` folder to the client-specific AddOns directory:
 
-`World of Warcraft/_retail_/Interface/AddOns/`
+- Retail: `World of Warcraft/_retail_/Interface/AddOns/`
+- Forever beta: `World of Warcraft/_classic_beta_/Interface/AddOns/`
 
-If you previously installed the standalone `SimplePartyHighlight`, disable or remove it after installing PPH 0.3.0 to avoid duplicate target highlight visuals.
+If you previously installed the standalone `SimplePartyHighlight`, disable or remove it after installing PPH 0.5.1 to avoid duplicate target highlight visuals.
+
+## Configuration compatibility
+
+The addon uses the same `PandahornPVPHelperDB` SavedVariables schema and the same Settings UI on Retail and Forever. No Lua-file editing or configuration conversion is required. Existing 0.4.x values are filled forward to schema version 5 without deleting user choices.
+
+Friendly Identity's client-specific default only applies when that setting does not already exist: enabled on Retail and disabled on Forever. An existing SavedVariables choice is preserved during upgrade.
+
+Retail and Forever installations normally keep their WTF/SavedVariables files in different client folders, so settings do not automatically synchronize between them. Copying the SavedVariables file is structurally supported, but gameplay-dependent behavior differs:
+
+- `arenaOnly` is retained for Retail but ignored on Forever.
+- `{spec}` is populated from Retail specialization inspection; on Forever it is empty unless a compatible specialization source becomes available, so `{class}` and `{party}` are the reliable tokens.
+- Colors, thickness, contrast, enable states, name format, prefix, and fallback text have the same meaning on both clients.
 
 ## Name format examples
 
@@ -97,7 +119,7 @@ If you previously installed the standalone `SimplePartyHighlight`, disable or re
 
 ## Architecture
 
-- `Core.lua` - lifecycle, ordered module initialization, SavedVariables, arena detection, callback bus and secret-value helpers.
+- `Core.lua` - lifecycle, client capability detection, ordered module initialization, SavedVariables, arena detection, callback bus and secret-value helpers.
 - `Data/Specs.lua` - specialization/class abbreviation data.
 - `Services/Inspect.lua` - throttled inspect queue and GUID -> specialization cache.
 - `Modules/FriendlyIdentity.lua` - party/target identity masking and format tokens.

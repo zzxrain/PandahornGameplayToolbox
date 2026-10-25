@@ -3,20 +3,26 @@ local ADDON_NAME, PPH = ...
 _G.PandahornPVPHelper = PPH
 
 PPH.name = "Pandahorn PVP Helper"
-PPH.version = "0.3.0"
+PPH.version = "0.5.1"
 PPH.modules = PPH.modules or {}
 PPH.moduleOrder = PPH.moduleOrder or {}
 PPH.callbacks = PPH.callbacks or {}
 PPH.initialized = false
 PPH.inArena = false
 
+local interfaceVersion = select(4, GetBuildInfo()) or 0
+PPH.interfaceVersion = interfaceVersion
+PPH.isForever = interfaceVersion >= 16000 and interfaceVersion < 17000
+
 local DEFAULTS = {
-    dbVersion = 3,
+    dbVersion = 5,
     enabled = true,
     debug = false,
 
     friendlyIdentity = {
-        enabled = true,
+        -- Forever has no arena gameplay at present, so identity masking is
+        -- opt-in there. Retail keeps the established enabled-by-default flow.
+        enabled = not PPH.isForever,
         partyFrames = true,
         targetFrame = true,
         keepPlayerName = true,
@@ -30,6 +36,9 @@ local DEFAULTS = {
         arenaOnly = true,
         showBorder = true,
         showGlow = true,
+        color = { 0.35, 1.00, 0.18 },
+        thickness = 5,
+        contrast = 85,
         borderColor = { 0.35, 1.00, 0.18, 1.00 },
         glowColor = { 0.20, 1.00, 0.12, 0.88 },
         borderSize = 5,
@@ -42,6 +51,14 @@ local DEFAULTS = {
 
     nameplateTargetHighlight = {
         enabled = true,
+        showBorder = true,
+        showGlow = true,
+        color = { 1.00, 0.72, 0.12 },
+        thickness = 4,
+        contrast = 90,
+        borderOutset = 2,
+        glowOutset = 4,
+        frameLevelOffset = 100,
     },
 }
 
@@ -135,6 +152,12 @@ function PPH:IsPlayerUnit(unit)
 end
 
 function PPH:IsArenaInstance()
+    -- WoW: Forever currently has no arena feature. Avoid probing PvP APIs that
+    -- may exist in the Mainline-derived client but have no usable game system.
+    if self.isForever then
+        return false
+    end
+
     local ok, inInstance, instanceType = pcall(IsInInstance)
     if ok and not self:IsSecret(inInstance) and not self:IsSecret(instanceType) then
         if inInstance and instanceType == "arena" then
@@ -159,6 +182,28 @@ function PPH:IsArenaInstance()
     return false
 end
 
+function PPH:HasArenaSupport()
+    return not self.isForever
+end
+
+function PPH:IsIdentityContextActive()
+    return self.isForever or self.inArena
+end
+
+function PPH:SupportsSpecializationInspection()
+    -- Forever uses its own progression/spec data rather than Retail spec IDs.
+    -- Class and party-number fallbacks remain reliable there.
+    return not self.isForever
+end
+
+function PPH:SafeRegisterEvent(event)
+    local ok = pcall(eventFrame.RegisterEvent, eventFrame, event)
+    if not ok then
+        self:Debug("Event unavailable on this client: " .. tostring(event))
+    end
+    return ok
+end
+
 function PPH:RegisterModule(name, module)
     if not name or not module then
         return
@@ -177,7 +222,7 @@ function PPH:RegisterCallback(event, owner, method)
     if not self.callbacks[event] then
         self.callbacks[event] = {}
         if event:sub(1, 4) ~= "PPH_" then
-            eventFrame:RegisterEvent(event)
+            self:SafeRegisterEvent(event)
         end
     end
 
@@ -246,11 +291,13 @@ function PPH:Initialize()
     self:Fire("PPH_READY")
 end
 
-eventFrame:RegisterEvent("ADDON_LOADED")
-eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-eventFrame:RegisterEvent("PVP_MATCH_ACTIVE")
-eventFrame:RegisterEvent("PVP_MATCH_INACTIVE")
+PPH:SafeRegisterEvent("ADDON_LOADED")
+PPH:SafeRegisterEvent("PLAYER_ENTERING_WORLD")
+PPH:SafeRegisterEvent("ZONE_CHANGED_NEW_AREA")
+if PPH:HasArenaSupport() then
+    PPH:SafeRegisterEvent("PVP_MATCH_ACTIVE")
+    PPH:SafeRegisterEvent("PVP_MATCH_INACTIVE")
+end
 
 eventFrame:SetScript("OnEvent", function(_, event, ...)
     if event == "ADDON_LOADED" then

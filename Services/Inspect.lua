@@ -13,6 +13,9 @@ local Inspect = {
 PPH.Inspect = Inspect
 
 local function GetInspectSpec(unit)
+    if not PPH:SupportsSpecializationInspection() then
+        return nil
+    end
     if C_SpecializationInfo and C_SpecializationInfo.GetInspectSpecialization then
         return C_SpecializationInfo.GetInspectSpecialization(unit)
     end
@@ -60,7 +63,7 @@ function Inspect:GetClassFile(unit)
 end
 
 function Inspect:QueueUnit(unit, highPriority)
-    if not PPH.inArena or not unit then
+    if not PPH:IsIdentityContextActive() or not PPH:SupportsSpecializationInspection() or not unit then
         return
     end
 
@@ -97,7 +100,7 @@ function Inspect:QueueUnit(unit, highPriority)
 end
 
 function Inspect:QueueParty()
-    if not PPH.inArena then
+    if not PPH:IsIdentityContextActive() or not PPH:SupportsSpecializationInspection() then
         return
     end
 
@@ -107,7 +110,7 @@ function Inspect:QueueParty()
 end
 
 function Inspect:Pump()
-    if self.pendingUnit or not PPH.inArena or #self.queue == 0 then
+    if self.pendingUnit or not PPH:IsIdentityContextActive() or #self.queue == 0 then
         return
     end
 
@@ -197,7 +200,7 @@ function Inspect:OnArenaStateChanged(_, active)
     if active then
         for _, delay in ipairs({ 0.5, 2.0, 5.0 }) do
             C_Timer.After(delay, function()
-                if PPH.inArena then
+                if PPH:IsIdentityContextActive() then
                     Inspect:QueueParty()
                 end
             end)
@@ -208,7 +211,7 @@ function Inspect:OnArenaStateChanged(_, active)
 end
 
 function Inspect:OnGroupRosterUpdate()
-    if PPH.inArena then
+    if PPH:IsIdentityContextActive() then
         C_Timer.After(0.25, function()
             Inspect:QueueParty()
         end)
@@ -216,7 +219,7 @@ function Inspect:OnGroupRosterUpdate()
 end
 
 function Inspect:OnTargetChanged()
-    if PPH.inArena then
+    if PPH:IsIdentityContextActive() then
         self:QueueUnit("target", true)
     end
 end

@@ -155,6 +155,101 @@ local function CreateButton(parent, text, x, y, width, onClick)
     return button
 end
 
+local function CreateSlider(parent, labelText, tooltip, x, y, width, minimum, maximum, step, getter, setter)
+    local slider = CreateFrame("Slider", nil, parent, "OptionsSliderTemplate")
+    slider:SetPoint("TOPLEFT", parent, "TOPLEFT", x, y)
+    slider:SetSize(width, 18)
+    slider:SetMinMaxValues(minimum, maximum)
+    slider:SetValueStep(step)
+    slider:SetObeyStepOnDrag(true)
+    slider.getter = getter
+    slider.setter = setter
+
+    slider.Text:SetText(labelText)
+    slider.Low:SetText(tostring(minimum))
+    slider.High:SetText(tostring(maximum))
+    AddTooltip(slider, tooltip)
+
+    slider:SetScript("OnValueChanged", function(self, value, userInput)
+        value = math.floor((value / step) + 0.5) * step
+        self.Text:SetText(labelText .. ": " .. value)
+        if userInput and self.setter then
+            self.setter(value)
+            PPH:Refresh("settings")
+        end
+    end)
+
+    function slider:Refresh()
+        local value = self.getter and self.getter() or minimum
+        self:SetValue(value)
+        self.Text:SetText(labelText .. ": " .. value)
+    end
+
+    function slider:SetControlEnabled(enabled)
+        self:SetEnabled(enabled)
+        self:SetAlpha(enabled and 1 or 0.5)
+    end
+
+    return slider
+end
+
+local function CreateColorButton(parent, labelText, tooltip, x, y, getter, setter)
+    local button = CreateFrame("Button", nil, parent)
+    button:SetPoint("TOPLEFT", parent, "TOPLEFT", x, y)
+    button:SetSize(170, 24)
+
+    local swatch = button:CreateTexture(nil, "ARTWORK")
+    swatch:SetPoint("LEFT", button, "LEFT", 2, 0)
+    swatch:SetSize(20, 20)
+    swatch:SetColorTexture(1, 1, 1, 1)
+
+    local border = button:CreateTexture(nil, "BACKGROUND")
+    border:SetPoint("TOPLEFT", swatch, "TOPLEFT", -1, 1)
+    border:SetPoint("BOTTOMRIGHT", swatch, "BOTTOMRIGHT", 1, -1)
+    border:SetColorTexture(0.15, 0.15, 0.15, 1)
+
+    local label = button:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    label:SetPoint("LEFT", swatch, "RIGHT", 8, 0)
+    label:SetText(labelText)
+    button.getter = getter
+    button.setter = setter
+    AddTooltip(button, tooltip)
+
+    function button:Refresh()
+        local color = self.getter and self.getter() or { 1, 1, 1 }
+        swatch:SetColorTexture(color[1], color[2], color[3], 1)
+    end
+
+    function button:SetControlEnabled(enabled)
+        self:SetEnabled(enabled)
+        self:SetAlpha(enabled and 1 or 0.5)
+    end
+
+    button:SetScript("OnClick", function(self)
+        local old = self.getter and self.getter() or { 1, 1, 1 }
+        local previous = { old[1], old[2], old[3] }
+        local function Apply()
+            local r, g, b = ColorPickerFrame:GetColorRGB()
+            self.setter({ r, g, b })
+            self:Refresh()
+            PPH:Refresh("settings-color")
+        end
+        local info = {
+            r = previous[1], g = previous[2], b = previous[3],
+            hasOpacity = false,
+            swatchFunc = Apply,
+            cancelFunc = function()
+                self.setter(previous)
+                self:Refresh()
+                PPH:Refresh("settings-color-cancel")
+            end,
+        }
+        ColorPickerFrame:SetupColorPickerAndShow(info)
+    end)
+
+    return button
+end
+
 function SettingsUI:RegisterControl(control)
     table.insert(self.controls, control)
     return control
@@ -191,9 +286,16 @@ function SettingsUI:RefreshControls()
     for _, control in ipairs(self.highlightChildren or {}) do
         control:SetControlEnabled(highlightChildrenEnabled)
     end
+    if self.arenaOnlyControl and PPH.isForever then
+        self.arenaOnlyControl:SetControlEnabled(false)
+    end
 
     if self.nameplateHighlightEnabled then
         self.nameplateHighlightEnabled:SetControlEnabled(globalEnabled and ni ~= nil)
+    end
+    local nameplateChildrenEnabled = globalEnabled and ni and ni.enabled
+    for _, control in ipairs(self.nameplateHighlightChildren or {}) do
+        control:SetControlEnabled(nameplateChildrenEnabled)
     end
 
     if self.previewText then
@@ -203,7 +305,11 @@ function SettingsUI:RefreshControls()
     end
 
     if self.statusText then
-        self.statusText:SetText("Arena detected: " .. (PPH.inArena and "|cff55ff55YES|r" or "|cffffaa55NO|r"))
+        if PPH.isForever then
+            self.statusText:SetText("Client: |cff55ff55WoW: Forever|r · Arena restriction bypassed")
+        else
+            self.statusText:SetText("Arena detected: " .. (PPH.inArena and "|cff55ff55YES|r" or "|cffffaa55NO|r"))
+        end
     end
 end
 
@@ -217,7 +323,7 @@ function SettingsUI:BuildPanel()
     scroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -30, 4)
 
     local content = CreateFrame("Frame", nil, scroll)
-    content:SetSize(720, 980)
+    content:SetSize(720, 1160)
     scroll:SetScrollChild(content)
     self.content = content
 
@@ -239,7 +345,11 @@ function SettingsUI:BuildPanel()
     description:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
     description:SetWidth(650)
     description:SetJustifyH("LEFT")
-    description:SetText("Modular PvP helper. Friendly identity masking is arena-only. Party target highlight can be limited to arenas or enabled everywhere.")
+    if PPH.isForever then
+        description:SetText("WoW: Forever mode. Arena restrictions are bypassed because arenas are not currently available; identity masking and highlights work in ordinary groups.")
+    else
+        description:SetText("Modular PvP helper. Friendly identity masking is arena-only. Party target highlight can be limited to arenas or enabled everywhere.")
+    end
 
     CreateSection(content, "General", 18, -82)
 
@@ -257,7 +367,9 @@ function SettingsUI:BuildPanel()
     self.fiEnabled = self:RegisterControl(CreateCheckbox(
         content,
         "Enable Friendly Identity",
-        "Replaces friendly player names with specialization/class identity text. This module only activates in arena instances.",
+        PPH.isForever
+            and "Replaces friendly player names with class/party identity text in ordinary groups. Forever does not currently expose Retail specialization identities."
+            or "Replaces friendly player names with specialization/class identity text. This module only activates in arena instances.",
         22, -194,
         function() return PPH.db.friendlyIdentity.enabled end,
         function(value) PPH.db.friendlyIdentity.enabled = value end
@@ -278,7 +390,9 @@ function SettingsUI:BuildPanel()
     local targetFrame = self:RegisterControl(CreateCheckbox(
         content,
         "Replace friendly player name on Target Frame",
-        "When your target is a friendly player in arena, replace the real name with the same identity format.",
+        PPH.isForever
+            and "When your target is a friendly player in a group, replace the real name with the same identity format."
+            or "When your target is a friendly player in arena, replace the real name with the same identity format.",
         46, -256,
         function() return PPH.db.friendlyIdentity.targetFrame end,
         function(value) PPH.db.friendlyIdentity.targetFrame = value end
@@ -389,12 +503,15 @@ function SettingsUI:BuildPanel()
 
     local arenaOnly = self:RegisterControl(CreateCheckbox(
         content,
-        "Arena only",
-        "When enabled, the target highlight is hidden outside arena instances.",
+        PPH.isForever and "Arena only (unavailable in Forever)" or "Arena only",
+        PPH.isForever
+            and "WoW: Forever does not currently have arenas, so this restriction is ignored."
+            or "When enabled, the target highlight is hidden outside arena instances.",
         46, -640,
         function() return PPH.db.partyTargetHighlight.arenaOnly end,
         function(value) PPH.db.partyTargetHighlight.arenaOnly = value end
     ))
+    self.arenaOnlyControl = arenaOnly
     table.insert(self.highlightChildren, arenaOnly)
 
     local showBorder = self:RegisterControl(CreateCheckbox(
@@ -417,42 +534,104 @@ function SettingsUI:BuildPanel()
     ))
     table.insert(self.highlightChildren, showGlow)
 
-    CreateSection(content, "Nameplate Target Highlight", 18, -748)
+    local partyColor = self:RegisterControl(CreateColorButton(
+        content, "Highlight color", "Choose the Party / Raid Frame target highlight color.",
+        46, -732,
+        function() return PPH.db.partyTargetHighlight.color end,
+        function(value) PPH.db.partyTargetHighlight.color = value end
+    ))
+    table.insert(self.highlightChildren, partyColor)
+
+    local partyThickness = self:RegisterControl(CreateSlider(
+        content, "Thickness", "Controls the border and glow width in pixels.",
+        250, -730, 150, 1, 12, 1,
+        function() return PPH.db.partyTargetHighlight.thickness end,
+        function(value) PPH.db.partyTargetHighlight.thickness = value end
+    ))
+    table.insert(self.highlightChildren, partyThickness)
+
+    local partyContrast = self:RegisterControl(CreateSlider(
+        content, "Contrast", "Controls highlight opacity and visual contrast.",
+        450, -730, 150, 0, 100, 5,
+        function() return PPH.db.partyTargetHighlight.contrast end,
+        function(value) PPH.db.partyTargetHighlight.contrast = value end
+    ))
+    table.insert(self.highlightChildren, partyContrast)
+
+    CreateSection(content, "Nameplate Target Highlight", 18, -790)
 
     self.nameplateHighlightEnabled = self:RegisterControl(CreateCheckbox(
         content,
         "Enable current-target highlight on nameplates",
-        "Highlights the current enemy or friendly target's nameplate. Uses the same strong border and outer glow style as Party Target Highlight and is layered above nameplate skins such as BetterBlizzPlates.",
-        22, -782,
+        "Highlights the current enemy or friendly target's nameplate with an independently configurable style, layered above nameplate skins such as BetterBlizzPlates.",
+        22, -824,
         function() return PPH.db.nameplateTargetHighlight.enabled end,
         function(value) PPH.db.nameplateTargetHighlight.enabled = value end
     ))
 
-    local nameplateStyleNote = content:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    nameplateStyleNote:SetPoint("TOPLEFT", content, "TOPLEFT", 50, -814)
-    nameplateStyleNote:SetText("Style follows the Party Target Highlight border and glow settings.")
+    self.nameplateHighlightChildren = {}
 
-    CreateSection(content, "Diagnostics", 18, -854)
+    local nameplateBorder = self:RegisterControl(CreateCheckbox(
+        content, "Show strong border", "Show the inner high-contrast nameplate border.",
+        46, -856,
+        function() return PPH.db.nameplateTargetHighlight.showBorder end,
+        function(value) PPH.db.nameplateTargetHighlight.showBorder = value end
+    ))
+    table.insert(self.nameplateHighlightChildren, nameplateBorder)
+
+    local nameplateGlow = self:RegisterControl(CreateCheckbox(
+        content, "Show outer glow", "Show the outer nameplate glow.",
+        46, -886,
+        function() return PPH.db.nameplateTargetHighlight.showGlow end,
+        function(value) PPH.db.nameplateTargetHighlight.showGlow = value end
+    ))
+    table.insert(self.nameplateHighlightChildren, nameplateGlow)
+
+    local nameplateColor = self:RegisterControl(CreateColorButton(
+        content, "Highlight color", "Choose the nameplate target highlight color independently.",
+        46, -918,
+        function() return PPH.db.nameplateTargetHighlight.color end,
+        function(value) PPH.db.nameplateTargetHighlight.color = value end
+    ))
+    table.insert(self.nameplateHighlightChildren, nameplateColor)
+
+    local nameplateThickness = self:RegisterControl(CreateSlider(
+        content, "Thickness", "Controls the nameplate border and glow width in pixels.",
+        250, -916, 150, 1, 12, 1,
+        function() return PPH.db.nameplateTargetHighlight.thickness end,
+        function(value) PPH.db.nameplateTargetHighlight.thickness = value end
+    ))
+    table.insert(self.nameplateHighlightChildren, nameplateThickness)
+
+    local nameplateContrast = self:RegisterControl(CreateSlider(
+        content, "Contrast", "Controls nameplate highlight opacity and visual contrast.",
+        450, -916, 150, 0, 100, 5,
+        function() return PPH.db.nameplateTargetHighlight.contrast end,
+        function(value) PPH.db.nameplateTargetHighlight.contrast = value end
+    ))
+    table.insert(self.nameplateHighlightChildren, nameplateContrast)
+
+    CreateSection(content, "Diagnostics", 18, -976)
 
     self.debugControl = self:RegisterControl(CreateCheckbox(
         content,
         "Debug messages",
         "Print additional PPH state information to chat for troubleshooting.",
-        22, -888,
+        22, -1010,
         function() return PPH.db.debug end,
         function(value) PPH.db.debug = value end
     ))
 
     self.statusText = content:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    self.statusText:SetPoint("TOPLEFT", content, "TOPLEFT", 270, -894)
+    self.statusText:SetPoint("TOPLEFT", content, "TOPLEFT", 270, -1016)
 
-    CreateButton(content, "Reset defaults", 22, -930, 120, function()
+    CreateButton(content, "Reset defaults", 22, -1052, 120, function()
         PPH:ResetToDefaults()
         SettingsUI:RefreshControls()
         PPH:Print("Settings reset to defaults.")
     end)
 
-    CreateButton(content, "Print status", 150, -930, 110, function()
+    CreateButton(content, "Print status", 150, -1052, 110, function()
         if PPH.PrintStatus then
             PPH:PrintStatus()
         else

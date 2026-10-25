@@ -27,7 +27,7 @@ function FriendlyIdentity:IsEnabled()
         and PPH.db.enabled
         and db
         and db.enabled
-        and PPH.inArena
+        and PPH:IsIdentityContextActive()
 end
 
 function FriendlyIdentity:NormalizeFormat(value)
@@ -95,6 +95,21 @@ end
 function FriendlyIdentity:IsGroupMemberUnit(unit)
     return type(unit) == "string"
         and (unit:match("^party%d+$") ~= nil or unit:match("^raid%d+$") ~= nil)
+end
+
+function FriendlyIdentity:IsUnitInPlayerGroup(unit)
+    if self:IsGroupMemberUnit(unit) then
+        return true
+    end
+
+    if _G.UnitInParty and PPH:GetSafeBoolean(UnitInParty, unit) == true then
+        return true
+    end
+    if _G.UnitInRaid and PPH:GetSafeBoolean(UnitInRaid, unit) == true then
+        return true
+    end
+
+    return false
 end
 
 function FriendlyIdentity:GetPartyNumber(unit)
@@ -175,6 +190,12 @@ function FriendlyIdentity:ShouldMaskUnit(unit)
 
     local db = self:GetSettings()
     if db.keepPlayerName and PPH:IsPlayerUnit(unit) then
+        return false
+    end
+
+    -- Outside an arena, Forever should only mask actual group members rather
+    -- than every friendly player selected in the open world.
+    if PPH.isForever and not self:IsUnitInPlayerGroup(unit) then
         return false
     end
 

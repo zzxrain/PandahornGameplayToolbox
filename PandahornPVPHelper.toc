@@ -1,8 +1,9 @@
-## Interface: 120100
+## Interface: 120100, 120105, 16001
+## AllowLoadGameType: standard, camelot
 ## Title: Pandahorn PVP Helper
-## Notes: Modular PvP helper for identity masking and current-target highlighting.
+## Notes: Retail and WoW: Forever helper for friendly identity masking and current-target highlighting.
 ## Author: Pandahorn
-## Version: 0.3.0
+## Version: 0.5.1
 ## SavedVariables: PandahornPVPHelperDB
 ## X-Category: PvP
 ## X-License: MIT

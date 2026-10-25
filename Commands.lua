@@ -11,17 +11,23 @@ function PPH:PrintStatus()
 
     self:Print("v" .. self.version
         .. " | addon=" .. OnOff(self.db.enabled)
-        .. " | arena=" .. OnOff(self.inArena))
+        .. " | client=" .. (self.isForever and "Forever" or "Retail")
+        .. " | arena=" .. (self.isForever and "N/A" or OnOff(self.inArena)))
     self:Print("Friendly Identity: " .. OnOff(fi.enabled)
         .. " | party=" .. OnOff(fi.partyFrames)
         .. " | target=" .. OnOff(fi.targetFrame)
         .. " | format=|cffffffff" .. fi.format .. "|r")
     self:Print("Party Target Highlight: " .. OnOff(hi.enabled)
-        .. " | arenaOnly=" .. OnOff(hi.arenaOnly)
+        .. " | arenaOnly=" .. (self.isForever and "N/A" or OnOff(hi.arenaOnly))
         .. " | border=" .. OnOff(hi.showBorder)
-        .. " | glow=" .. OnOff(hi.showGlow))
+        .. " | glow=" .. OnOff(hi.showGlow)
+        .. " | thickness=" .. tostring(hi.thickness)
+        .. " | contrast=" .. tostring(hi.contrast))
     self:Print("Nameplate Target Highlight: " .. OnOff(ni.enabled)
-        .. " | style=Party Target Highlight")
+        .. " | border=" .. OnOff(ni.showBorder)
+        .. " | glow=" .. OnOff(ni.showGlow)
+        .. " | thickness=" .. tostring(ni.thickness)
+        .. " | contrast=" .. tostring(ni.contrast))
 end
 
 local function PrintHelp()
@@ -147,6 +153,10 @@ SlashCmdList.PANDAHORNPVPHELPER = function(message)
         if subcommand == "on" or subcommand == "off" then
             PPH.db.partyTargetHighlight.enabled = subcommand == "on"
         elseif subcommand == "arena" or subcommand == "border" or subcommand == "glow" then
+            if subcommand == "arena" and PPH.isForever then
+                PPH:Print("Arena-only mode is unavailable and ignored on WoW: Forever.")
+                return
+            end
             local value = ParseOnOff(valueText)
             if value == nil then
                 PPH:Print("Usage: /pph highlight " .. subcommand .. " on|off")

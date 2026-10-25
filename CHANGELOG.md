@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.5.1
+
+- Changed Friendly Identity to default to disabled on new WoW: Forever installations while retaining the existing Retail default.
+- Kept Friendly Identity available as an opt-in Forever feature for users who still want class/party masking in ordinary groups.
+- Confirmed Retail 12.1.5 loading metadata through Interface `120105`.
+
+## 0.5.0
+
+- Added WoW: Forever (`camelot`, Interface `16001`) loading support alongside Retail.
+- Added runtime Forever detection and capability-based handling instead of treating the five-digit interface number as a Classic client.
+- Bypassed arena-only restrictions on Forever, where arenas are not currently available, so friendly identity and party-frame highlighting remain usable in ordinary groups.
+- Avoided Retail specialization inspection on Forever; identity formatting safely falls back to class, party number, or configured fallback text.
+- Made event registration tolerant of client-specific missing events and stopped registering Retail PvP match events on Forever.
+- Documented cross-client SavedVariables compatibility and the gameplay-specific differences between Retail and Forever.
+
+## 0.4.0
+
+- Added Settings UI controls for Party / Raid Frame highlight color, thickness, and contrast.
+- Added separate Settings UI controls for nameplate highlight color, thickness, and contrast.
+- Made nameplate border/glow visibility and visual styling independent from Party / Raid Frame highlighting.
+- Preserved existing core identity masking and event-driven target detection behavior.
+
 ## 0.3.0
 
 - Added an independent current-target nameplate highlight for enemy and friendly nameplates.

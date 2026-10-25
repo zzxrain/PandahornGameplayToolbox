@@ -1,8 +1,8 @@
-## Interface: 120100
+## Interface: 120105, 16001
 ## Title: Pandahorn Gameplay Toolbox
 ## Notes: Modular gameplay toolbox for identity masking and current-target highlighting.
 ## Author: Pandahorn
-## Version: 0.5.1
+## Version: 0.6.0
 ## SavedVariables: PandahornGameplayToolboxDB
 ## IconTexture: Interface\AddOns\PandahornGameplayToolbox\Media\addon_icon_128.tga
 ## X-Category: PvP

@@ -19,7 +19,7 @@ function PartyTargetHighlight:IsActive()
         return false
     end
 
-    if db.arenaOnly and not PGT.inArena then
+    if PGT.supportsArena and db.arenaOnly and not PGT.inArena then
         return false
     end
 
@@ -272,7 +272,7 @@ function PartyTargetHighlight:InstallHooks()
     self.hooksInstalled = true
 end
 
-function PartyTargetHighlight:OnEvent(_, event)
+function PartyTargetHighlight:OnEvent(event)
     if event == "PLAYER_REGEN_ENABLED" and not self.needsPostCombatResync then
         return
     end

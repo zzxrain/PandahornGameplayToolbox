@@ -3,12 +3,24 @@ local ADDON_NAME, PGT = ...
 _G.PandahornGameplayToolbox = PGT
 
 PGT.name = "Pandahorn Gameplay Toolbox"
-PGT.version = "0.5.1"
+PGT.version = "0.6.0"
 PGT.modules = PGT.modules or {}
 PGT.moduleOrder = PGT.moduleOrder or {}
 PGT.callbacks = PGT.callbacks or {}
 PGT.initialized = false
 PGT.inArena = false
+
+-- Forever uses the modern UI API with a 1.60.x / 16xxx client version.
+-- Do not use WOW_PROJECT_ID or the presence of C_PvP to distinguish clients.
+local buildOK, clientVersion, _, _, interfaceVersion = pcall(GetBuildInfo)
+PGT.isForever = buildOK
+    and type(clientVersion) == "string"
+    and clientVersion:match("^1%.60%.") ~= nil
+    and type(interfaceVersion) == "number"
+    and interfaceVersion >= 16000 and interfaceVersion < 16100
+    or false
+PGT.supportsArena = not PGT.isForever
+PGT.clientName = PGT.isForever and "WoW: Forever" or "WoW Retail"
 
 local DEFAULTS = {
     dbVersion = 4,
@@ -16,7 +28,7 @@ local DEFAULTS = {
     debug = false,
 
     friendlyIdentity = {
-        enabled = true,
+        enabled = PGT.supportsArena,
         partyFrames = true,
         targetFrame = true,
         keepPlayerName = true,
@@ -27,7 +39,7 @@ local DEFAULTS = {
 
     partyTargetHighlight = {
         enabled = true,
-        arenaOnly = true,
+        arenaOnly = PGT.supportsArena,
         showBorder = true,
         showGlow = true,
         color = { 0.35, 1.00, 0.18 },
@@ -146,6 +158,9 @@ function PGT:IsPlayerUnit(unit)
 end
 
 function PGT:IsArenaInstance()
+    if not self.supportsArena then
+        return false
+    end
     local ok, inInstance, instanceType = pcall(IsInInstance)
     if ok and not self:IsSecret(inInstance) and not self:IsSecret(instanceType) then
         if inInstance and instanceType == "arena" then
@@ -260,8 +275,10 @@ end
 eventFrame:RegisterEvent("ADDON_LOADED")
 eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-eventFrame:RegisterEvent("PVP_MATCH_ACTIVE")
-eventFrame:RegisterEvent("PVP_MATCH_INACTIVE")
+if PGT.supportsArena then
+    eventFrame:RegisterEvent("PVP_MATCH_ACTIVE")
+    eventFrame:RegisterEvent("PVP_MATCH_INACTIVE")
+end
 
 eventFrame:SetScript("OnEvent", function(_, event, ...)
     if event == "ADDON_LOADED" then

@@ -4,10 +4,18 @@ Technical notes for addon maintainers. User instructions and screenshots are in 
 
 ## Runtime and validation
 
-The current addon version is 0.5.1, targeting WoW Retail 12.1 with `Interface: 120100`.
+The current addon version is 0.6.0, targeting WoW Retail 12.1.5 (`120105`) and
+WoW: Forever 1.60.1 (`16001`) in a single manifest.
 The cloud environment has no WoW client; Lua loading and mocked checks cannot replace in-game validation.
 Before releasing, follow [TESTING.md](TESTING.md) to check settings, arena behavior, and third-party addon compatibility.
 Use BugSack / BugGrabber to capture full Lua error stacks.
+
+From the repository root, run `lua5.1 tests/run.lua` for mocked regression checks covering
+manifest/version consistency, preference preservation, client-specific defaults and resets,
+arena gating, combat-end callbacks, identity formatting, missing arena APIs, Forever control
+availability, inspection suppression, and nameplate target transitions. These checks do not
+initialize the Blizzard UI or render highlights.
+Run `./scripts/package.sh` to build the release ZIP.
 
 ## Packaging
 
@@ -49,8 +57,24 @@ Initialization preserves existing settings and fills in missing defaults.
 
 ## Behavior details
 
-Friendly Identity runs only in arenas. Specializations come from the inspect API and are cached by GUID.
+Friendly Identity runs only in Retail arenas. Specializations come from the inspect API and are cached by GUID.
 Until specialization data is available, labels fall back to class, party number, or `Ally` to avoid revealing teammate names while masking is active.
+
+Forever is detected from both the `1.60.x` version string and the `16000–16099`
+interface range returned by `GetBuildInfo()`; API presence and `WOW_PROJECT_ID` are not
+reliable client identifiers. The shipped Forever interface is `16001`. These identifiers
+are corroborated by
+[ForeverAuras client detection](https://github.com/neroxrw/foreverauras/blob/302ebd1f8b4702831bf660caaf7375daa7a8845a/ForeverAuras/Init.lua#L420)
+and the
+[ClassicUI Forever manifest](https://github.com/wowaddonmaker/classicuiforever/blob/03bd8f625580cd0c8789a3a5d87f78cf856c7b21/ClassicUIForever.toc).
+They are community compatibility references, not a live-client validation.
+
+Forever has no arenas: Friendly Identity defaults off and installs no hooks, and the
+inspect service does not subscribe to events or queue inspections. Match events are not
+registered. Party highlights default to all zones and ignore the arena-only flag on
+Forever. Existing stored preferences remain intact, including those imported from Retail;
+the Settings panel shows the effective unavailable controls disabled. Reset uses the
+current client's defaults. The SavedVariables schema remains version 4.
 
 Party Target Highlight uses Blizzard's `selectionHighlight:IsShown()` state to avoid extra `UnitIsUnit()` calls.
 Nameplate highlighting is event-driven, retains a single active-nameplate reference, and does not scan every frame.

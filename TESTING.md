@@ -1,6 +1,23 @@
-# Pandahorn Gameplay Toolbox 0.5.1 - In-game Test Checklist
+# Pandahorn Gameplay Toolbox 0.6.0 - In-game Test Checklist
 
-Because the addon cannot be executed against a real WoW client in this build environment, use this checklist for the first arena session.
+Because the addon cannot be executed against a real WoW client in this build environment,
+complete the relevant checks below in each supported client. Sections B–D and arena-specific
+steps in E apply to Retail; Forever has no arenas.
+
+Run `lua5.1 tests/run.lua` before the in-game checks. On Retail 12.1.5, also confirm that
+the addon loads without enabling "Load out of date AddOns".
+
+## WoW: Forever checks
+
+1. Confirm `/dump GetBuildInfo()` reports a 1.60.x client with interface 16001.
+2. Install the same release ZIP in Forever's `Interface/AddOns/` directory; confirm it loads without enabling out-of-date addons.
+3. With a fresh SavedVariables table, confirm Friendly Identity is unchecked and disabled, and Arena only is unchecked and disabled.
+4. Confirm the status text identifies WoW: Forever and explains that arenas and Friendly Identity are unavailable.
+5. Join a party using Blizzard compact party / raid-style frames. Target each teammate and clear target; confirm the highlight moves and clears in the open world and in dungeons.
+6. Complete section F for friendly/enemy nameplates, independent styles, toggles and rapid target changes.
+7. Import a Retail SavedVariables table with Friendly Identity and Arena only enabled. Confirm names remain normal and party highlighting still works outside arenas. Confirm other colors, thickness and preferences remain intact.
+8. Reset settings; confirm Forever defaults return. Toggle the master switch off and on and confirm highlighting follows it.
+9. Check BugSack / BugGrabber for errors during login, group changes, combat, zone transitions and settings changes. Test any installed frame/nameplate skins.
 
 ## A. Settings registration
 
@@ -55,6 +72,12 @@ Because the addon cannot be executed against a real WoW client in this build env
 7. Disable Party Target Highlight while leaving the nameplate feature enabled and confirm the nameplate feature still works.
 8. Change the nameplate color, thickness, and contrast and confirm these settings apply immediately.
 9. Give Party / Raid Frames and nameplates visibly different styles, then confirm each retains its independent configuration.
+
+## Combat regression
+
+1. Enter combat before a party frame has a custom highlight, then select that teammate.
+2. Leave combat and confirm deferred highlight creation completes.
+3. Enter and leave combat again without a pending resync and confirm no Lua errors occur.
 
 ## G. Compatibility / diagnostics
 

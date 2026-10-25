@@ -23,7 +23,8 @@ end
 
 function FriendlyIdentity:IsEnabled()
     local db = self:GetSettings()
-    return PGT.db
+    return PGT.supportsArena
+        and PGT.db
         and PGT.db.enabled
         and db
         and db.enabled
@@ -387,6 +388,9 @@ function FriendlyIdentity:OnConfigChanged()
 end
 
 function FriendlyIdentity:OnInitialize()
+    if not PGT.supportsArena then
+        return
+    end
     self:InstallHooks()
     PGT:RegisterCallback("PLAYER_LOGIN", self, "OnArenaStateChanged")
     PGT:RegisterCallback("PLAYER_TARGET_CHANGED", self, "OnTargetChanged")

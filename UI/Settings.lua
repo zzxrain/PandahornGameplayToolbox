@@ -271,9 +271,9 @@ function SettingsUI:RefreshControls()
     local ni = PGT.db.nameplateTargetHighlight
 
     if self.fiEnabled then
-        self.fiEnabled:SetControlEnabled(globalEnabled)
+        self.fiEnabled:SetControlEnabled(globalEnabled and PGT.supportsArena)
     end
-    local fiChildrenEnabled = globalEnabled and fi.enabled
+    local fiChildrenEnabled = globalEnabled and PGT.supportsArena and fi.enabled
     for _, control in ipairs(self.fiChildren or {}) do
         control:SetControlEnabled(fiChildrenEnabled)
     end
@@ -284,6 +284,9 @@ function SettingsUI:RefreshControls()
     local highlightChildrenEnabled = globalEnabled and hi.enabled
     for _, control in ipairs(self.highlightChildren or {}) do
         control:SetControlEnabled(highlightChildrenEnabled)
+    end
+    if self.arenaOnly then
+        self.arenaOnly:SetControlEnabled(highlightChildrenEnabled and PGT.supportsArena)
     end
 
     if self.nameplateHighlightEnabled then
@@ -301,7 +304,11 @@ function SettingsUI:RefreshControls()
     end
 
     if self.statusText then
-        self.statusText:SetText("Arena detected: " .. (PGT.inArena and "|cff55ff55YES|r" or "|cffffaa55NO|r"))
+        if PGT.supportsArena then
+            self.statusText:SetText(PGT.clientName .. " | Arena detected: " .. (PGT.inArena and "|cff55ff55YES|r" or "|cffffaa55NO|r"))
+        else
+            self.statusText:SetText("WoW: Forever | Arenas and Friendly Identity are unavailable.")
+        end
     end
 end
 
@@ -337,7 +344,9 @@ function SettingsUI:BuildPanel()
     description:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
     description:SetWidth(650)
     description:SetJustifyH("LEFT")
-    description:SetText("Modular gameplay toolbox. Friendly identity masking is arena-only. Party target highlight can be limited to arenas or enabled everywhere.")
+    description:SetText(PGT.isForever
+        and "Target highlights for parties, raids and nameplates. Friendly Identity is unavailable because WoW: Forever has no arenas."
+        or "Modular gameplay toolbox. Friendly identity masking is arena-only. Party target highlight can be limited to arenas or enabled everywhere.")
 
     CreateSection(content, "General", 18, -82)
 
@@ -357,7 +366,7 @@ function SettingsUI:BuildPanel()
         "Enable Friendly Identity",
         "Replaces friendly player names with specialization/class identity text. This module only activates in arena instances.",
         22, -194,
-        function() return PGT.db.friendlyIdentity.enabled end,
+        function() return PGT.supportsArena and PGT.db.friendlyIdentity.enabled end,
         function(value) PGT.db.friendlyIdentity.enabled = value end
     ))
 
@@ -490,9 +499,10 @@ function SettingsUI:BuildPanel()
         "Arena only",
         "When enabled, the target highlight is hidden outside arena instances.",
         46, -640,
-        function() return PGT.db.partyTargetHighlight.arenaOnly end,
+        function() return PGT.supportsArena and PGT.db.partyTargetHighlight.arenaOnly end,
         function(value) PGT.db.partyTargetHighlight.arenaOnly = value end
     ))
+    self.arenaOnly = arenaOnly
     table.insert(self.highlightChildren, arenaOnly)
 
     local showBorder = self:RegisterControl(CreateCheckbox(
@@ -662,14 +672,15 @@ function SettingsUI:PrintStatus()
     local ni = PGT.db.nameplateTargetHighlight
 
     PGT:Print("v" .. PGT.version
+        .. " | client=" .. PGT.clientName
         .. " | addon=" .. OnOff(PGT.db.enabled)
         .. " | arena=" .. OnOff(PGT.inArena))
-    PGT:Print("Friendly Identity: " .. OnOff(fi.enabled)
+    PGT:Print("Friendly Identity: " .. (PGT.supportsArena and OnOff(fi.enabled) or "UNAVAILABLE (no arenas)")
         .. " | party=" .. OnOff(fi.partyFrames)
         .. " | target=" .. OnOff(fi.targetFrame)
         .. " | format=|cffffffff" .. fi.format .. "|r")
     PGT:Print("Party Target Highlight: " .. OnOff(hi.enabled)
-        .. " | arenaOnly=" .. OnOff(hi.arenaOnly)
+        .. " | arenaOnly=" .. OnOff(PGT.supportsArena and hi.arenaOnly)
         .. " | border=" .. OnOff(hi.showBorder)
         .. " | glow=" .. OnOff(hi.showGlow)
         .. " | thickness=" .. tostring(hi.thickness)

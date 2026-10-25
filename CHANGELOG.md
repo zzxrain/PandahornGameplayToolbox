@@ -1,5 +1,52 @@
 # Changelog
 
+## 0.6.0
+
+### Compatibility
+
+- Updated the Retail interface declaration to `120105` for World of Warcraft Retail 12.1.5.
+- Added WoW: Forever 1.60.1 support with interface `16001`. One release ZIP and manifest serve both clients.
+- Detect Forever using its 1.60.x version string and interface range, rather than assuming that modern PvP APIs identify Retail.
+- Updated the addon runtime and manifest version together.
+
+### WoW: Forever behavior
+
+- Friendly Identity is disabled by default and unavailable because Forever has no arenas.
+  Its name-replacement hooks and specialization inspection service are not initialized on this client.
+- Party / raid-style party frame target highlighting defaults to all zones. An arena-only
+  setting imported from Retail is ignored on Forever, so it cannot leave the feature permanently inactive.
+- Nameplate target highlighting remains independently configurable for friendly and enemy targets.
+- The Settings panel identifies the active client and disables unavailable Friendly Identity
+  and Arena only controls. Status output reports their effective availability.
+- Do not register arena match start/end events on Forever, and skip arena detection APIs.
+
+### Fixes
+
+- Corrected the Party Target Highlight combat-end callback signature. The
+  `PLAYER_REGEN_ENABLED` event now checks whether a deferred resync is actually
+  pending before scheduling work, while still creating highlights deferred during combat.
+
+### Development and validation
+
+- Added a Lua 5.1 regression suite for version metadata, saved preference preservation,
+  arena-only highlighting, combat-end resynchronization, identity formatting, module loading,
+  and arena API fallbacks. Forever checks cover defaults, reset behavior, imported settings,
+  disabled controls, inspection suppression, and nameplate target transitions on both clients.
+- Updated the developer guide and in-game checklist for this version.
+- Release packages continue to contain only the manifest, seven runtime Lua files,
+  and the addon icon. Documentation and tests are excluded.
+
+### Upgrade notes and limitations
+
+- Existing SavedVariables and user preferences are preserved; no settings reset is required.
+- The SavedVariables schema remains version 4. Reset to defaults uses the current client's
+  defaults; stored Retail preferences are retained when loaded on Forever.
+- Friendly Identity retains its Retail arena-only behavior, and Retail party highlighting
+  remains arena-only by default.
+- Mocked Lua checks do not replace validation in a live WoW client. Settings rendering,
+  Retail arena transitions, Forever gameplay, combat restrictions, and third-party frame compatibility still require
+  the in-game checks in `TESTING.md`.
+
 ## 0.5.1
 
 - Renamed the addon to Pandahorn Gameplay Toolbox, including its manifest, code namespace, SavedVariables table, callback identifiers, UI text, and documentation.

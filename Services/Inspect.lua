@@ -60,7 +60,7 @@ function Inspect:GetClassFile(unit)
 end
 
 function Inspect:QueueUnit(unit, highPriority)
-    if not PGT.inArena or not unit then
+    if not PGT.supportsArena or not PGT.inArena or not unit then
         return
     end
 
@@ -222,6 +222,9 @@ function Inspect:OnTargetChanged()
 end
 
 function Inspect:OnInitialize()
+    if not PGT.supportsArena then
+        return
+    end
     PGT:RegisterCallback("INSPECT_READY", self, "OnInspectReady")
     PGT:RegisterCallback("GROUP_ROSTER_UPDATE", self, "OnGroupRosterUpdate")
     PGT:RegisterCallback("PLAYER_TARGET_CHANGED", self, "OnTargetChanged")
